@@ -7,6 +7,13 @@ import { BarChart3, Lock, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
+// User accounts data
+const userAccounts = {
+  admin: { password: "admin123", role: "admin", name: "Administrator", email: "admin@salatiga.go.id" },
+  verifikator: { password: "verifikator123", role: "verifikator", name: "Verifikator", email: "verifikator@salatiga.go.id" },
+  operator: { password: "operator123", role: "operator", name: "Operator", email: "operator@salatiga.go.id" }
+};
+
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -18,17 +25,32 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate authentication (replace with real authentication)
+    // Simulate authentication
     setTimeout(() => {
-      if (username === "admin" && password === "admin123") {
+      const user = userAccounts[username as keyof typeof userAccounts];
+      
+      if (user && user.password === password) {
         toast({
           title: "Login Berhasil",
-          description: "Selamat datang di SIMDAG Admin Dashboard",
+          description: `Selamat datang, ${user.name}`,
         });
-        // Store auth token/session (implement proper auth here)
+        
+        // Store auth data
         localStorage.setItem("simdag_auth", "true");
-        localStorage.setItem("simdag_role", "admin");
-        navigate("/admin");
+        localStorage.setItem("simdag_role", user.role);
+        localStorage.setItem("simdag_user", JSON.stringify({
+          username,
+          name: user.name,
+          email: user.email,
+          role: user.role
+        }));
+        
+        // Navigate based on role
+        if (user.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard"); // For verifikator and operator
+        }
       } else {
         toast({
           title: "Login Gagal",
@@ -106,11 +128,13 @@ const Login = () => {
               </Button>
             </form>
 
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">
-                Demo: Username: <code className="bg-muted px-1 rounded">admin</code>, 
-                Password: <code className="bg-muted px-1 rounded">admin123</code>
-              </p>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground font-semibold">Akun Demo:</p>
+              <div className="space-y-1 text-xs text-muted-foreground">
+                <p><strong>Admin:</strong> admin / admin123</p>
+                <p><strong>Verifikator:</strong> verifikator / verifikator123</p>
+                <p><strong>Operator:</strong> operator / operator123</p>
+              </div>
             </div>
           </CardContent>
         </Card>

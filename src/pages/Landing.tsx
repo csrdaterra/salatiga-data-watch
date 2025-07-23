@@ -2,12 +2,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, TrendingUp, Store, Users, MapPin, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import HeroSlider from "@/components/HeroSlider";
+import InteractiveMap from "@/components/InteractiveMap";
+import TrendAnalytics from "@/components/TrendAnalytics";
 
 const Landing = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">
       {/* Header with Login Button */}
-      <header className="border-b bg-background/80 backdrop-blur-sm">
+      <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -30,27 +33,37 @@ const Landing = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6 text-center">
-          <div className="max-w-4xl mx-auto space-y-8">
-            <div className="space-y-4">
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Perdagangan Kota Salatiga
-              </h1>
-              <h2 className="text-3xl font-semibold text-foreground">
-                Sistem Informasi Perdagangan Terintegrasi
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Monitoring dan analisis komprehensif untuk mendukung kebijakan perdagangan 
-                yang efektif di Kota Salatiga
-              </p>
-            </div>
-
-            <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto">
-              <MapPin className="w-10 h-10 text-primary-foreground" />
-            </div>
+      {/* Hero Section with Slider */}
+      <section className="py-12">
+        <div className="container mx-auto px-6">
+          <div className="text-center space-y-4 mb-8">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Perdagangan Kota Salatiga
+            </h1>
+            <h2 className="text-3xl font-semibold text-foreground">
+              Sistem Informasi Perdagangan Terintegrasi
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Monitoring dan analisis komprehensif untuk mendukung kebijakan perdagangan 
+              yang efektif di Kota Salatiga
+            </p>
           </div>
+          
+          <HeroSlider />
+        </div>
+      </section>
+
+      {/* Interactive Map Section */}
+      <section className="py-16 bg-background/50">
+        <div className="container mx-auto px-6">
+          <InteractiveMap />
+        </div>
+      </section>
+
+      {/* Trend Analytics Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-6">
+          <TrendAnalytics />
         </div>
       </section>
 
