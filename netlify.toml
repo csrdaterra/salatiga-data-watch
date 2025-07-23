@@ -2,6 +2,13 @@
   publish = "dist"
   command = "npm run build"
 
+# Handle admin routes - redirect to login if not authenticated
+[[redirects]]
+  from = "/admin/*"
+  to = "/index.html"
+  status = 200
+
+# Handle all other routes for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
