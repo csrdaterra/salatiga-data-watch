@@ -26,6 +26,8 @@ const gasStationSchema = z.object({
   name: z.string().min(1, "Nama SPBU harus diisi"),
   address: z.string().min(1, "Alamat harus diisi"),
   fuelTypes: z.array(z.string()).min(1, "Pilih minimal satu jenis BBM"),
+  longitude: z.string().min(1, "Longitude harus diisi"),
+  latitude: z.string().min(1, "Latitude harus diisi"),
   kecamatan: z.string().optional(),
 });
 
@@ -47,6 +49,8 @@ const GasStations = () => {
       name: "",
       address: "",
       fuelTypes: [],
+      longitude: "",
+      latitude: "",
       kecamatan: "",
     },
   });
@@ -65,6 +69,8 @@ const GasStations = () => {
         name: data.name,
         address: data.address,
         fuelTypes: data.fuelTypes,
+        longitude: data.longitude,
+        latitude: data.latitude,
         kecamatan: data.kecamatan,
       };
       addGasStation(newStation);
@@ -86,6 +92,8 @@ const GasStations = () => {
       name: station.name,
       address: station.address,
       fuelTypes: station.fuelTypes,
+      longitude: station.longitude,
+      latitude: station.latitude,
       kecamatan: station.kecamatan || "",
     });
     setIsDialogOpen(true);
@@ -106,6 +114,8 @@ const GasStations = () => {
       name: "",
       address: "",
       fuelTypes: [],
+      longitude: "",
+      latitude: "",
       kecamatan: "",
     });
     setIsDialogOpen(true);
@@ -164,29 +174,35 @@ const GasStations = () => {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="kecamatan"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Kecamatan</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="longitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Longitude</FormLabel>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih kecamatan" />
-                          </SelectTrigger>
+                          <Input placeholder="110.4928" {...field} />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Sidorejo">Sidorejo</SelectItem>
-                          <SelectItem value="Sidomukti">Sidomukti</SelectItem>
-                          <SelectItem value="Tingkir">Tingkir</SelectItem>
-                          <SelectItem value="Argomulyo">Argomulyo</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="latitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Latitude</FormLabel>
+                        <FormControl>
+                          <Input placeholder="-7.3298" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <FormField
                   control={form.control}
@@ -236,6 +252,30 @@ const GasStations = () => {
                   )}
                 />
 
+                <FormField
+                  control={form.control}
+                  name="kecamatan"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kecamatan</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih kecamatan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Sidorejo">Sidorejo</SelectItem>
+                          <SelectItem value="Sidomukti">Sidomukti</SelectItem>
+                          <SelectItem value="Tingkir">Tingkir</SelectItem>
+                          <SelectItem value="Argomulyo">Argomulyo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <div className="flex justify-end space-x-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                     Batal
@@ -267,6 +307,7 @@ const GasStations = () => {
                 <TableHead>Nama SPBU</TableHead>
                 <TableHead>Alamat</TableHead>
                 <TableHead>Jenis BBM</TableHead>
+                <TableHead>Koordinat</TableHead>
                 <TableHead>Kecamatan</TableHead>
                 <TableHead>Aksi</TableHead>
               </TableRow>
@@ -284,6 +325,11 @@ const GasStations = () => {
                         </Badge>
                       ))}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-xs text-muted-foreground">
+                      {station.latitude}, {station.longitude}
+                    </span>
                   </TableCell>
                   <TableCell>
                     {station.kecamatan ? (

@@ -14,20 +14,29 @@ export interface Market {
 const defaultMarkets: Market[] = [
   {
     id: 1,
-    name: "Pasar Argosari",
-    address: "Jl. Diponegoro No. 123, Salatiga",
+    name: "Pasar Raya I",
+    address: "Jalan Jendral Sudirman, Kel. Kutowinangun Kidul, Kec. Tingkir",
     contact: "0298-321123",
-    longitude: "110.4872",
-    latitude: "-7.3313",
-    kecamatan: "Sidorejo"
+    longitude: "110.4928",
+    latitude: "-7.3298",
+    kecamatan: "Tingkir"
   },
   {
     id: 2,
-    name: "Pasar Raya Salatiga",
-    address: "Jl. Ahmad Yani No. 45, Salatiga",
+    name: "Pasar Rejosari",
+    address: "Jalan Hasanudin, Kel. Mangunsari, Kec. Sidomukti",
     contact: "0298-321456",
-    longitude: "110.4928",
-    latitude: "-7.3298",
+    longitude: "110.4856",
+    latitude: "-7.3325",
+    kecamatan: "Sidomukti"
+  },
+  {
+    id: 3,
+    name: "Pasar Blauran I",
+    address: "Jalan Taman Pahlawan, Kel. Kutowinangun Lor, Kec. Tingkir",
+    contact: "0298-321789",
+    longitude: "110.4912",
+    latitude: "-7.3285",
     kecamatan: "Tingkir"
   }
 ];
