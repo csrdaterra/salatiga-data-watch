@@ -7,6 +7,10 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import Markets from "./pages/admin/Markets";
+import LargeStores from "./pages/admin/LargeStores";
+import GasStations from "./pages/admin/GasStations";
+import LPGSubsidized from "./pages/admin/LPGSubsidized";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,7 +26,10 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
-            {/* Admin sub-routes will be added here */}
+            <Route path="markets" element={<Markets />} />
+            <Route path="large-stores" element={<LargeStores />} />
+            <Route path="gas-stations" element={<GasStations />} />
+            <Route path="lpg-subsidized" element={<LPGSubsidized />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
