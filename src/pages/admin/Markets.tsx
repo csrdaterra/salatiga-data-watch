@@ -64,7 +64,12 @@ const Markets = () => {
     } else {
       const newMarket: Market = {
         id: Date.now(),
-        ...data,
+        name: data.name,
+        address: data.address,
+        contact: data.contact,
+        longitude: data.longitude,
+        latitude: data.latitude,
+        kecamatan: data.kecamatan,
       };
       const updatedMarkets = [...markets, newMarket];
       setMarkets(updatedMarkets);

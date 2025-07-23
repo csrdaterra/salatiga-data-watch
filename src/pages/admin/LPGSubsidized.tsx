@@ -1,108 +1,71 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useToast } from "@/hooks/use-toast";
+import { 
+  getLPGAgents, 
+  addLPGAgent, 
+  updateLPGAgent, 
+  deleteLPGAgent, 
+  type LPGAgent 
+} from "@/stores/lpgStore";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Edit, Trash2, MapPin } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
 
 const lpgSchema = z.object({
-  agentName: z.string().min(1, "Nama agen wajib diisi"),
-  ownerName: z.string().min(1, "Nama pemilik wajib diisi"),
-  address: z.string().min(1, "Alamat wajib diisi"),
-  contact: z.string().min(1, "Kontak wajib diisi"),
-  longitude: z.string().min(1, "Longitude wajib diisi"),
-  latitude: z.string().min(1, "Latitude wajib diisi"),
+  name: z.string().min(1, "Nama agen harus diisi"),
+  address: z.string().min(1, "Alamat harus diisi"),
+  kecamatan: z.string().optional(),
 });
 
 type LPGFormData = z.infer<typeof lpgSchema>;
 
-interface LPGAgent {
-  id: number;
-  agentName: string;
-  ownerName: string;
-  address: string;
-  contact: string;
-  longitude: string;
-  latitude: string;
-}
-
 const LPGSubsidized = () => {
-  const { toast } = useToast();
-  const [lpgAgents, setLpgAgents] = useState<LPGAgent[]>([
-    {
-      id: 1,
-      agentName: "Agen LPG Sumber Rejeki",
-      ownerName: "Bambang Sutrisno",
-      address: "Jl. Merdeka No. 34, Salatiga",
-      contact: "0298-334455",
-      longitude: "110.4823",
-      latitude: "-7.3267"
-    },
-    {
-      id: 2,
-      agentName: "Agen Gas Barokah",
-      ownerName: "Endang Sari",
-      address: "Jl. Veteran No. 78, Salatiga",
-      contact: "0298-335566",
-      longitude: "110.4967",
-      latitude: "-7.3289"
-    },
-    {
-      id: 3,
-      agentName: "Agen LPG Makmur",
-      ownerName: "Hadi Prasetyo",
-      address: "Jl. Hasanuddin No. 56, Salatiga",
-      contact: "0298-336677",
-      longitude: "110.4889",
-      latitude: "-7.3312"
-    }
-  ]);
+  const [lpgAgents, setLpgAgents] = useState<LPGAgent[]>([]);
   const [editingLPG, setEditingLPG] = useState<LPGAgent | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    setLpgAgents(getLPGAgents());
+  }, []);
 
   const form = useForm<LPGFormData>({
     resolver: zodResolver(lpgSchema),
     defaultValues: {
-      agentName: "",
-      ownerName: "",
+      name: "",
       address: "",
-      contact: "",
-      longitude: "",
-      latitude: "",
+      kecamatan: "",
     },
   });
 
   const onSubmit = (data: LPGFormData) => {
     if (editingLPG) {
-      setLpgAgents(lpgAgents.map(agent => 
-        agent.id === editingLPG.id 
-          ? { ...agent, ...data }
-          : agent
-      ));
+      updateLPGAgent(editingLPG.id, data);
+      setLpgAgents(getLPGAgents());
       toast({
         title: "Berhasil",
         description: "Data agen LPG berhasil diperbarui",
       });
     } else {
-      const newLPGAgent: LPGAgent = {
+      const newAgent: LPGAgent = {
         id: Date.now(),
-        agentName: data.agentName,
-        ownerName: data.ownerName,
+        name: data.name,
         address: data.address,
-        contact: data.contact,
-        longitude: data.longitude,
-        latitude: data.latitude,
+        kecamatan: data.kecamatan,
       };
-      setLpgAgents([...lpgAgents, newLPGAgent]);
+      addLPGAgent(newAgent);
+      setLpgAgents(getLPGAgents());
       toast({
         title: "Berhasil",
-        description: "Data agen LPG berhasil ditambahkan",
+        description: "Agen LPG baru berhasil ditambahkan",
       });
     }
     
@@ -111,23 +74,32 @@ const LPGSubsidized = () => {
     setIsDialogOpen(false);
   };
 
-  const handleEdit = (lpgAgent: LPGAgent) => {
-    setEditingLPG(lpgAgent);
-    form.reset(lpgAgent);
+  const handleEdit = (agent: LPGAgent) => {
+    setEditingLPG(agent);
+    form.reset({
+      name: agent.name,
+      address: agent.address,
+      kecamatan: agent.kecamatan || "",
+    });
     setIsDialogOpen(true);
   };
 
   const handleDelete = (id: number) => {
-    setLpgAgents(lpgAgents.filter(agent => agent.id !== id));
+    deleteLPGAgent(id);
+    setLpgAgents(getLPGAgents());
     toast({
       title: "Berhasil",
-      description: "Data agen LPG berhasil dihapus",
+      description: "Agen LPG berhasil dihapus",
     });
   };
 
   const handleAddNew = () => {
     setEditingLPG(null);
-    form.reset();
+    form.reset({
+      name: "",
+      address: "",
+      kecamatan: "",
+    });
     setIsDialogOpen(true);
   };
 
@@ -142,7 +114,7 @@ const LPGSubsidized = () => {
           <DialogTrigger asChild>
             <Button onClick={handleAddNew} className="flex items-center space-x-2">
               <Plus className="w-4 h-4" />
-              <span>Tambah Agen LPG</span>
+              <span>Tambah Agen</span>
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
@@ -158,25 +130,12 @@ const LPGSubsidized = () => {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
                   control={form.control}
-                  name="agentName"
+                  name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nama Agen</FormLabel>
+                      <FormLabel>Nama Perusahaan</FormLabel>
                       <FormControl>
-                        <Input placeholder="Masukkan nama agen LPG" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="ownerName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nama Pemilik</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Masukkan nama pemilik" {...field} />
+                        <Input placeholder="Masukkan nama perusahaan" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -189,7 +148,7 @@ const LPGSubsidized = () => {
                     <FormItem>
                       <FormLabel>Alamat</FormLabel>
                       <FormControl>
-                        <Input placeholder="Masukkan alamat agen" {...field} />
+                        <Input placeholder="Masukkan alamat lengkap" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -197,45 +156,27 @@ const LPGSubsidized = () => {
                 />
                 <FormField
                   control={form.control}
-                  name="contact"
+                  name="kecamatan"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kontak</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Masukkan nomor telepon" {...field} />
-                      </FormControl>
+                      <FormLabel>Kecamatan</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih kecamatan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Sidorejo">Sidorejo</SelectItem>
+                          <SelectItem value="Sidomukti">Sidomukti</SelectItem>
+                          <SelectItem value="Tingkir">Tingkir</SelectItem>
+                          <SelectItem value="Argomulyo">Argomulyo</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="longitude"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Longitude</FormLabel>
-                        <FormControl>
-                          <Input placeholder="110.4872" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="latitude"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Latitude</FormLabel>
-                        <FormControl>
-                          <Input placeholder="-7.3313" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
                 <div className="flex justify-end space-x-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                     Batal
@@ -264,25 +205,25 @@ const LPGSubsidized = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nama Agen</TableHead>
-                <TableHead>Pemilik</TableHead>
+                <TableHead>Nama Perusahaan</TableHead>
                 <TableHead>Alamat</TableHead>
-                <TableHead>Kontak</TableHead>
-                <TableHead>Koordinat</TableHead>
-                <TableHead className="w-[120px]">Aksi</TableHead>
+                <TableHead>Kecamatan</TableHead>
+                <TableHead>Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {lpgAgents.map((agent) => (
                 <TableRow key={agent.id}>
-                  <TableCell className="font-medium">{agent.agentName}</TableCell>
-                  <TableCell>{agent.ownerName}</TableCell>
+                  <TableCell className="font-medium">{agent.name}</TableCell>
                   <TableCell>{agent.address}</TableCell>
-                  <TableCell>{agent.contact}</TableCell>
                   <TableCell>
-                    <span className="text-xs text-muted-foreground">
-                      {agent.latitude}, {agent.longitude}
-                    </span>
+                    {agent.kecamatan ? (
+                      <span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-sm">
+                        {agent.kecamatan}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">

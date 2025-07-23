@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, TrendingUp, Store, Users, MapPin, ArrowRight, AlertTriangle, ShoppingCart, Eye, FileText } from "lucide-react";
+import { BarChart3, TrendingUp, Store, Users, MapPin, ArrowRight, AlertTriangle, ShoppingCart, Eye, FileText, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import HeroSlider from "@/components/HeroSlider";
