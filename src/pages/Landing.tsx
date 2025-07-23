@@ -1,12 +1,36 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, TrendingUp, Store, Users, MapPin, ArrowRight, AlertTriangle, ShoppingCart, Eye, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import HeroSlider from "@/components/HeroSlider";
 import InteractiveMap from "@/components/InteractiveMap";
 import TrendAnalytics from "@/components/TrendAnalytics";
+import { getMarkets, getMarketsByKecamatan, type Market } from "@/stores/marketStore";
 
 const Landing = () => {
+  const [markets, setMarkets] = useState<Market[]>([]);
+  const [marketsByKecamatan, setMarketsByKecamatan] = useState<{ [key: string]: Market[] }>({});
+
+  useEffect(() => {
+    const marketData = getMarkets();
+    setMarkets(marketData);
+    setMarketsByKecamatan(getMarketsByKecamatan());
+  }, []);
+
+  // Calculate statistics based on actual market data
+  const totalMarkets = markets.length;
+  const totalTraders = markets.length * 60; // Estimated 60 traders per market
+  const kecamatanData = Object.entries(marketsByKecamatan).map(([kecamatan, kecamatanMarkets]) => ({
+    area: `Kec. ${kecamatan}`,
+    markets: `${kecamatanMarkets.length} Pasar Tradisional`,
+    traders: `${kecamatanMarkets.length * 60}+ Pedagang`,
+    highlight: kecamatan === "Sidorejo" ? "primary" : 
+              kecamatan === "Sidomulyo" ? "warning" :
+              kecamatan === "Tingkir" ? "success" : "accent"
+  }));
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">
       {/* Header with Login Button */}
@@ -57,13 +81,13 @@ const Landing = () => {
             </p>
             <div className="flex justify-center gap-4 pt-4">
               <div className="bg-primary/10 text-primary px-4 py-2 rounded-full font-semibold">
-                🏛️ 11 Pasar Tradisional
+                🏛️ {totalMarkets} Pasar Tradisional
               </div>
               <div className="bg-warning/10 text-warning px-4 py-2 rounded-full font-semibold">
                 📊 Real-time Monitoring
               </div>
               <div className="bg-success/10 text-success px-4 py-2 rounded-full font-semibold">
-                🎯 4 Kecamatan
+                🎯 {Object.keys(marketsByKecamatan).length} Kecamatan
               </div>
             </div>
           </div>
@@ -108,7 +132,7 @@ const Landing = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-center text-base">
-                  Pemantauan harga komoditas pangan dan ketersediaan barang di 11 pasar tradisional Salatiga
+                  Pemantauan harga komoditas pangan dan ketersediaan barang di {totalMarkets} pasar tradisional Salatiga
                 </CardDescription>
               </CardContent>
             </Card>
@@ -158,7 +182,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Statistics Section */}
+      {/* Statistics Section - Dynamic Data */}
       <section className="py-16">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
@@ -166,56 +190,71 @@ const Landing = () => {
               Cakupan Monitoring Bapokmas Salatiga
             </h3>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Monitoring komprehensif di 4 kecamatan dengan 11 pasar tradisional untuk menjaga stabilitas pangan
+              {totalMarkets > 0 ? (
+                `Monitoring komprehensif di ${Object.keys(marketsByKecamatan).length} kecamatan dengan ${totalMarkets} pasar tradisional yang telah terdaftar untuk menjaga stabilitas pangan`
+              ) : (
+                `Belum ada pasar yang terdaftar. Silakan tambahkan data pasar melalui panel admin.`
+              )}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { area: "Kec. Sidorejo", markets: "3 Pasar Tradisional", traders: "180+ Pedagang", highlight: "primary" },
-              { area: "Kec. Sidomulyo", markets: "2 Pasar Tradisional", traders: "145+ Pedagang", highlight: "warning" },
-              { area: "Kec. Tingkir", markets: "4 Pasar Tradisional", traders: "220+ Pedagang", highlight: "success" },
-              { area: "Kec. Argomulyo", markets: "2 Pasar Tradisional", traders: "125+ Pedagang", highlight: "accent" }
-            ].map((area, index) => (
-              <Card key={index} className={`text-center border-2 hover:border-${area.highlight}/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-gradient-to-br from-card to-${area.highlight}/5`}>
-                <CardHeader>
-                  <div className={`w-12 h-12 bg-${area.highlight}/10 rounded-lg flex items-center justify-center mx-auto mb-3`}>
-                    <MapPin className={`w-6 h-6 text-${area.highlight}`} />
-                  </div>
-                  <CardTitle className={`text-xl text-${area.highlight}`}>{area.area}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <p className="font-semibold text-foreground text-lg">{area.markets}</p>
-                  <p className="text-muted-foreground font-medium">{area.traders}</p>
-                  <div className={`inline-block px-3 py-1 bg-${area.highlight}/10 text-${area.highlight} rounded-full text-sm font-medium`}>
-                    Monitoring Aktif
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {totalMarkets > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {kecamatanData.map((area, index) => (
+                <Card key={index} className={`text-center border-2 hover:border-${area.highlight}/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-gradient-to-br from-card to-${area.highlight}/5`}>
+                  <CardHeader>
+                    <div className={`w-12 h-12 bg-${area.highlight}/10 rounded-lg flex items-center justify-center mx-auto mb-3`}>
+                      <MapPin className={`w-6 h-6 text-${area.highlight}`} />
+                    </div>
+                    <CardTitle className={`text-xl text-${area.highlight}`}>{area.area}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <p className="font-semibold text-foreground text-lg">{area.markets}</p>
+                    <p className="text-muted-foreground font-medium">{area.traders}</p>
+                    <div className={`inline-block px-3 py-1 bg-${area.highlight}/10 text-${area.highlight} rounded-full text-sm font-medium`}>
+                      Monitoring Aktif
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Store className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-xl text-muted-foreground">Belum ada data pasar yang terdaftar</p>
+              <p className="text-muted-foreground mb-6">Silakan tambahkan data pasar melalui panel admin</p>
+              <Button asChild>
+                <Link to="/login">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Tambah Data Pasar
+                </Link>
+              </Button>
+            </div>
+          )}
 
           {/* Additional Statistics */}
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="text-center border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
-              <CardHeader>
-                <CardTitle className="text-3xl font-bold text-primary">670+</CardTitle>
-                <CardDescription className="text-lg">Total Pedagang Terdaftar</CardDescription>
-              </CardHeader>
-            </Card>
-            <Card className="text-center border-2 border-warning/20 bg-gradient-to-br from-warning/5 to-warning/10">
-              <CardHeader>
-                <CardTitle className="text-3xl font-bold text-warning">50+</CardTitle>
-                <CardDescription className="text-lg">Komoditas Dipantau</CardDescription>
-              </CardHeader>
-            </Card>
-            <Card className="text-center border-2 border-success/20 bg-gradient-to-br from-success/5 to-success/10">
-              <CardHeader>
-                <CardTitle className="text-3xl font-bold text-success">24/7</CardTitle>
-                <CardDescription className="text-lg">Monitoring Real-time</CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
+          {totalMarkets > 0 && (
+            <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+              <Card className="text-center border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                <CardHeader>
+                  <CardTitle className="text-3xl font-bold text-primary">{totalTraders}+</CardTitle>
+                  <CardDescription className="text-lg">Total Pedagang Terdaftar</CardDescription>
+                </CardHeader>
+              </Card>
+              <Card className="text-center border-2 border-warning/20 bg-gradient-to-br from-warning/5 to-warning/10">
+                <CardHeader>
+                  <CardTitle className="text-3xl font-bold text-warning">50+</CardTitle>
+                  <CardDescription className="text-lg">Komoditas Dipantau</CardDescription>
+                </CardHeader>
+              </Card>
+              <Card className="text-center border-2 border-success/20 bg-gradient-to-br from-success/5 to-success/10">
+                <CardHeader>
+                  <CardTitle className="text-3xl font-bold text-success">24/7</CardTitle>
+                  <CardDescription className="text-lg">Monitoring Real-time</CardDescription>
+                </CardHeader>
+              </Card>
+            </div>
+          )}
         </div>
       </section>
 

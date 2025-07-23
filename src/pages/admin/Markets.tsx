@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,11 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Plus, Edit, Trash2, Store } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { getMarkets, setMarkets, type Market } from "@/stores/marketStore";
 
 const marketSchema = z.object({
   name: z.string().min(1, "Nama pasar wajib diisi"),
@@ -18,41 +21,20 @@ const marketSchema = z.object({
   contact: z.string().min(1, "Kontak wajib diisi"),
   longitude: z.string().min(1, "Longitude wajib diisi"),
   latitude: z.string().min(1, "Latitude wajib diisi"),
+  kecamatan: z.string().min(1, "Kecamatan wajib diisi"),
 });
 
 type MarketFormData = z.infer<typeof marketSchema>;
 
-interface Market {
-  id: number;
-  name: string;
-  address: string;
-  contact: string;
-  longitude: string;
-  latitude: string;
-}
-
 const Markets = () => {
   const { toast } = useToast();
-  const [markets, setMarkets] = useState<Market[]>([
-    {
-      id: 1,
-      name: "Pasar Argosari",
-      address: "Jl. Diponegoro No. 123, Salatiga",
-      contact: "0298-321123",
-      longitude: "110.4872",
-      latitude: "-7.3313"
-    },
-    {
-      id: 2,
-      name: "Pasar Raya Salatiga",
-      address: "Jl. Ahmad Yani No. 45, Salatiga",
-      contact: "0298-321456",
-      longitude: "110.4928",
-      latitude: "-7.3298"
-    }
-  ]);
+  const [markets, setMarketsState] = useState<Market[]>([]);
   const [editingMarket, setEditingMarket] = useState<Market | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    setMarketsState(getMarkets());
+  }, []);
 
   const form = useForm<MarketFormData>({
     resolver: zodResolver(marketSchema),
@@ -62,16 +44,19 @@ const Markets = () => {
       contact: "",
       longitude: "",
       latitude: "",
+      kecamatan: "",
     },
   });
 
   const onSubmit = (data: MarketFormData) => {
     if (editingMarket) {
-      setMarkets(markets.map(market => 
+      const updatedMarkets = markets.map(market => 
         market.id === editingMarket.id 
           ? { ...market, ...data }
           : market
-      ));
+      );
+      setMarkets(updatedMarkets);
+      setMarketsState(updatedMarkets);
       toast({
         title: "Berhasil",
         description: "Data pasar berhasil diperbarui",
@@ -79,13 +64,11 @@ const Markets = () => {
     } else {
       const newMarket: Market = {
         id: Date.now(),
-        name: data.name,
-        address: data.address,
-        contact: data.contact,
-        longitude: data.longitude,
-        latitude: data.latitude,
+        ...data,
       };
-      setMarkets([...markets, newMarket]);
+      const updatedMarkets = [...markets, newMarket];
+      setMarkets(updatedMarkets);
+      setMarketsState(updatedMarkets);
       toast({
         title: "Berhasil",
         description: "Data pasar berhasil ditambahkan",
@@ -104,7 +87,9 @@ const Markets = () => {
   };
 
   const handleDelete = (id: number) => {
-    setMarkets(markets.filter(market => market.id !== id));
+    const updatedMarkets = markets.filter(market => market.id !== id);
+    setMarkets(updatedMarkets);
+    setMarketsState(updatedMarkets);
     toast({
       title: "Berhasil",
       description: "Data pasar berhasil dihapus",
@@ -181,6 +166,29 @@ const Markets = () => {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="kecamatan"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Kecamatan</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih kecamatan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Sidorejo">Sidorejo</SelectItem>
+                          <SelectItem value="Sidomulyo">Sidomulyo</SelectItem>
+                          <SelectItem value="Tingkir">Tingkir</SelectItem>
+                          <SelectItem value="Argomulyo">Argomulyo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -239,6 +247,7 @@ const Markets = () => {
               <TableRow>
                 <TableHead>Nama Pasar</TableHead>
                 <TableHead>Alamat</TableHead>
+                <TableHead>Kecamatan</TableHead>
                 <TableHead>Kontak</TableHead>
                 <TableHead>Koordinat</TableHead>
                 <TableHead className="w-[120px]">Aksi</TableHead>
@@ -249,6 +258,11 @@ const Markets = () => {
                 <TableRow key={market.id}>
                   <TableCell className="font-medium">{market.name}</TableCell>
                   <TableCell>{market.address}</TableCell>
+                  <TableCell>
+                    <span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-sm">
+                      {market.kecamatan}
+                    </span>
+                  </TableCell>
                   <TableCell>{market.contact}</TableCell>
                   <TableCell>
                     <span className="text-xs text-muted-foreground">
