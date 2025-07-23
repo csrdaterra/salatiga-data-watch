@@ -22,6 +22,8 @@ import { Plus, Edit, Trash2, MapPin } from "lucide-react";
 const lpgSchema = z.object({
   name: z.string().min(1, "Nama agen harus diisi"),
   address: z.string().min(1, "Alamat harus diisi"),
+  longitude: z.string().min(1, "Longitude harus diisi"),
+  latitude: z.string().min(1, "Latitude harus diisi"),
   kecamatan: z.string().optional(),
 });
 
@@ -42,6 +44,8 @@ const LPGSubsidized = () => {
     defaultValues: {
       name: "",
       address: "",
+      longitude: "",
+      latitude: "",
       kecamatan: "",
     },
   });
@@ -59,6 +63,8 @@ const LPGSubsidized = () => {
         id: Date.now(),
         name: data.name,
         address: data.address,
+        longitude: data.longitude,
+        latitude: data.latitude,
         kecamatan: data.kecamatan,
       };
       addLPGAgent(newAgent);
@@ -79,6 +85,8 @@ const LPGSubsidized = () => {
     form.reset({
       name: agent.name,
       address: agent.address,
+      longitude: agent.longitude,
+      latitude: agent.latitude,
       kecamatan: agent.kecamatan || "",
     });
     setIsDialogOpen(true);
@@ -98,6 +106,8 @@ const LPGSubsidized = () => {
     form.reset({
       name: "",
       address: "",
+      longitude: "",
+      latitude: "",
       kecamatan: "",
     });
     setIsDialogOpen(true);
@@ -154,6 +164,37 @@ const LPGSubsidized = () => {
                     </FormItem>
                   )}
                 />
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="longitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Longitude</FormLabel>
+                        <FormControl>
+                          <Input placeholder="110.4928" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="latitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Latitude</FormLabel>
+                        <FormControl>
+                          <Input placeholder="-7.3298" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
                   control={form.control}
                   name="kecamatan"
@@ -207,6 +248,7 @@ const LPGSubsidized = () => {
               <TableRow>
                 <TableHead>Nama Perusahaan</TableHead>
                 <TableHead>Alamat</TableHead>
+                <TableHead>Koordinat</TableHead>
                 <TableHead>Kecamatan</TableHead>
                 <TableHead>Aksi</TableHead>
               </TableRow>
@@ -216,6 +258,11 @@ const LPGSubsidized = () => {
                 <TableRow key={agent.id}>
                   <TableCell className="font-medium">{agent.name}</TableCell>
                   <TableCell>{agent.address}</TableCell>
+                  <TableCell>
+                    <span className="text-xs text-muted-foreground">
+                      {agent.latitude}, {agent.longitude}
+                    </span>
+                  </TableCell>
                   <TableCell>
                     {agent.kecamatan ? (
                       <span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-sm">
