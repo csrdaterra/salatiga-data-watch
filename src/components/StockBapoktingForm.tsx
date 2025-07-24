@@ -257,8 +257,7 @@ const StockBapoktingForm = () => {
       }
       const dataToSave = data.map(row => ({
         ...row,
-        operator_name: operatorName,
-        user_id: user?.id
+        operator_name: operatorName
       }));
 
       const { error } = await supabase
