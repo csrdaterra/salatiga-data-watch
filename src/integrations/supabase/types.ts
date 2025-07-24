@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      price_surveys: {
+        Row: {
+          commodity_id: number
+          created_at: string
+          id: string
+          market_id: number
+          notes: string | null
+          operator_name: string
+          price: number
+          quality: string
+          stock_status: string
+          survey_date: string
+          updated_at: string
+        }
+        Insert: {
+          commodity_id: number
+          created_at?: string
+          id?: string
+          market_id: number
+          notes?: string | null
+          operator_name: string
+          price: number
+          quality: string
+          stock_status: string
+          survey_date: string
+          updated_at?: string
+        }
+        Update: {
+          commodity_id?: number
+          created_at?: string
+          id?: string
+          market_id?: number
+          notes?: string | null
+          operator_name?: string
+          price?: number
+          quality?: string
+          stock_status?: string
+          survey_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

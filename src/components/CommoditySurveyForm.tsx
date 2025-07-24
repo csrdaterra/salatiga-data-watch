@@ -136,7 +136,7 @@ const CommoditySurveyForm = () => {
       }));
 
       // Insert to database
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('price_surveys')
         .insert(surveyData);
 
