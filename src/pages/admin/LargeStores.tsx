@@ -43,7 +43,7 @@ const LargeStores = () => {
       ownerName: "Sutrisno",
       address: "Jalan Taman Sari, Belakang Pasar Raya II, Kel. Kutowinangun Lor, Kec. Tingkir",
       contact: "0298-321456",
-      commodityName: "Sembako, Kebutuhan Pokok",
+      commodityName: "Garam Halus (kg), Garam Bata (kg), Telur (kg), Minyak Goreng Kemasan (liter), Minyak Goreng Curah (liter), Gula Pasir (kg), Tepung Terigu (kg), Kedelai (kg), Beras (kg)",
       longitude: "110.4892",
       latitude: "-7.3298"
     },
@@ -53,7 +53,7 @@ const LargeStores = () => {
       ownerName: "Dadi Hermawan",
       address: "Jalan Kalinyamat No 36, Kel. Kutowinangun Kidul, Kec. Tingkir",
       contact: "0298-322789",
-      commodityName: "Sembako, Beras, Gula",
+      commodityName: "Garam Halus (kg), Garam Bata (kg), Telur (kg), Minyak Goreng Kemasan (liter), Minyak Goreng Curah (liter), Gula Pasir (kg), Tepung Terigu (kg), Kedelai (kg), Beras (kg)",
       longitude: "110.4887",
       latitude: "-7.3312"
     },
@@ -63,7 +63,7 @@ const LargeStores = () => {
       ownerName: "Margono",
       address: "Jalan Canden, Kel. Kutowinangun Lor, Kec. Tingkir",
       contact: "0298-324567",
-      commodityName: "Kebutuhan Pokok, Minyak Goreng",
+      commodityName: "Garam Halus (kg), Garam Bata (kg), Telur (kg), Minyak Goreng Kemasan (liter), Minyak Goreng Curah (liter), Gula Pasir (kg), Tepung Terigu (kg), Kedelai (kg), Beras (kg)",
       longitude: "110.4885",
       latitude: "-7.3285"
     },
@@ -73,7 +73,7 @@ const LargeStores = () => {
       ownerName: "Sutopo",
       address: "Jalan Taman Pahlawan No 41, Kel. Kutowinangun Kidul, Kec. Tingkir",
       contact: "0298-325890",
-      commodityName: "Sembako, Kebutuhan Pokok",
+      commodityName: "Garam Halus (kg), Garam Bata (kg), Telur (kg), Minyak Goreng Kemasan (liter), Minyak Goreng Curah (liter), Gula Pasir (kg), Tepung Terigu (kg), Kedelai (kg), Beras (kg)",
       longitude: "110.4890",
       latitude: "-7.3315"
     },
@@ -83,7 +83,7 @@ const LargeStores = () => {
       ownerName: "Joko Suprianto",
       address: "Pulutan, Kel. Pulutan, Kec. Sidorejo",
       contact: "0298-326123",
-      commodityName: "Beras, Sembako, Pupuk",
+      commodityName: "Garam Halus (kg), Garam Bata (kg), Telur (kg), Minyak Goreng Kemasan (liter), Minyak Goreng Curah (liter), Gula Pasir (kg), Tepung Terigu (kg), Kedelai (kg), Beras (kg)",
       longitude: "110.4912",
       latitude: "-7.3356"
     },
@@ -93,7 +93,7 @@ const LargeStores = () => {
       ownerName: "Bambang Kaloka",
       address: "Jalan Patimura, Kel. Salatiga, Kec. Sidorejo",
       contact: "0298-327456",
-      commodityName: "Bahan Bangunan, Kebutuhan Pokok",
+      commodityName: "Garam Halus (kg), Garam Bata (kg), Telur (kg), Minyak Goreng Kemasan (liter), Minyak Goreng Curah (liter), Gula Pasir (kg), Tepung Terigu (kg), Kedelai (kg), Beras (kg)",
       longitude: "110.4925",
       latitude: "-7.3340"
     },
@@ -103,7 +103,7 @@ const LargeStores = () => {
       ownerName: "Slamet Riyadi",
       address: "Jalan Imam Bonjol, Kel. Sidorejo Lor, Kec. Tingkir",
       contact: "0298-328789",
-      commodityName: "Bahan Bangunan, Semen, Cat",
+      commodityName: "Garam Halus (kg), Garam Bata (kg), Telur (kg), Minyak Goreng Kemasan (liter), Minyak Goreng Curah (liter), Gula Pasir (kg), Tepung Terigu (kg), Kedelai (kg), Beras (kg)",
       longitude: "110.4878",
       latitude: "-7.3275"
     },
@@ -113,7 +113,7 @@ const LargeStores = () => {
       ownerName: "Manah Sutrisno",
       address: "Jalan Kalitaman, Kel. Kutowinangun Kidul, Kec. Tingkir",
       contact: "0298-329012",
-      commodityName: "Bahan Bangunan, Keramik",
+      commodityName: "Garam Halus (kg), Garam Bata (kg), Telur (kg), Minyak Goreng Kemasan (liter), Minyak Goreng Curah (liter), Gula Pasir (kg), Tepung Terigu (kg), Kedelai (kg), Beras (kg)",
       longitude: "110.4895",
       latitude: "-7.3320"
     },
@@ -123,7 +123,7 @@ const LargeStores = () => {
       ownerName: "Sukamto",
       address: "Jalan Kalinyamat No 31, Kel. Kutowinangun Kidul, Kec. Tingkir",
       contact: "0298-330345",
-      commodityName: "Sembako, Kebutuhan Pokok",
+      commodityName: "Garam Halus (kg), Garam Bata (kg), Telur (kg), Minyak Goreng Kemasan (liter), Minyak Goreng Curah (liter), Gula Pasir (kg), Tepung Terigu (kg), Kedelai (kg), Beras (kg)",
       longitude: "110.4888",
       latitude: "-7.3310"
     },
@@ -133,7 +133,7 @@ const LargeStores = () => {
       ownerName: "Manis Sari",
       address: "Jalan Kesambi No 22, Kel. Kalicacing, Kec. Salatiga",
       contact: "0298-331678",
-      commodityName: "Gula, Sembako, Minuman",
+      commodityName: "Garam Halus (kg), Garam Bata (kg), Telur (kg), Minyak Goreng Kemasan (liter), Minyak Goreng Curah (liter), Gula Pasir (kg), Tepung Terigu (kg), Kedelai (kg), Beras (kg)",
       longitude: "110.4935",
       latitude: "-7.3325"
     },
@@ -143,7 +143,7 @@ const LargeStores = () => {
       ownerName: "Waringin Setyo",
       address: "Jalan Kesambi, Kel. Kalicacing, Kec. Salatiga",
       contact: "0298-332901",
-      commodityName: "Sembako, Kebutuhan Pokok",
+      commodityName: "Garam Halus (kg), Garam Bata (kg), Telur (kg), Minyak Goreng Kemasan (liter), Minyak Goreng Curah (liter), Gula Pasir (kg), Tepung Terigu (kg), Kedelai (kg), Beras (kg)",
       longitude: "110.4940",
       latitude: "-7.3330"
     }
