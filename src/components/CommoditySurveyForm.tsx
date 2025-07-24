@@ -8,10 +8,62 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Save, MapPin, DollarSign, RefreshCw } from "lucide-react";
-import { getCommodities, getMarketCommoditiesByMarket } from "@/stores/commodityStore";
-import { getMarkets } from "@/stores/marketStore";
+import { Save, MapPin, DollarSign, RefreshCw, ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+
+// Daftar 50 item Kepokmas
+const kepokmasItems = [
+  { id: 1, name: "Beras Premium", unit: "kg" },
+  { id: 2, name: "Beras Medium", unit: "kg" },
+  { id: 3, name: "Beras IR 64", unit: "kg" },
+  { id: 4, name: "Gula Pasir", unit: "kg" },
+  { id: 5, name: "Gula Merah", unit: "kg" },
+  { id: 6, name: "Minyak Goreng Kemasan", unit: "liter" },
+  { id: 7, name: "Minyak Goreng Curah", unit: "liter" },
+  { id: 8, name: "Minyak Kelapa Sawit", unit: "liter" },
+  { id: 9, name: "Tepung Terigu Protein Tinggi", unit: "kg" },
+  { id: 10, name: "Tepung Terigu Protein Sedang", unit: "kg" },
+  { id: 11, name: "Daging Sapi Murni", unit: "kg" },
+  { id: 12, name: "Daging Sapi Has Dalam", unit: "kg" },
+  { id: 13, name: "Daging Ayam Ras", unit: "kg" },
+  { id: 14, name: "Daging Ayam Kampung", unit: "kg" },
+  { id: 15, name: "Telur Ayam Ras", unit: "kg" },
+  { id: 16, name: "Telur Ayam Kampung", unit: "kg" },
+  { id: 17, name: "Ikan Bandeng", unit: "kg" },
+  { id: 18, name: "Ikan Tongkol", unit: "kg" },
+  { id: 19, name: "Ikan Teri", unit: "kg" },
+  { id: 20, name: "Ikan Kembung", unit: "kg" },
+  { id: 21, name: "Cabai Merah Besar", unit: "kg" },
+  { id: 22, name: "Cabai Merah Keriting", unit: "kg" },
+  { id: 23, name: "Cabai Rawit Merah", unit: "kg" },
+  { id: 24, name: "Cabai Rawit Hijau", unit: "kg" },
+  { id: 25, name: "Bawang Merah", unit: "kg" },
+  { id: 26, name: "Bawang Putih", unit: "kg" },
+  { id: 27, name: "Bawang Bombay", unit: "kg" },
+  { id: 28, name: "Tomat", unit: "kg" },
+  { id: 29, name: "Kentang", unit: "kg" },
+  { id: 30, name: "Wortel", unit: "kg" },
+  { id: 31, name: "Kol/Kubis", unit: "kg" },
+  { id: 32, name: "Sawi Hijau", unit: "kg" },
+  { id: 33, name: "Kangkung", unit: "ikat" },
+  { id: 34, name: "Bayam", unit: "ikat" },
+  { id: 35, name: "Kacang Panjang", unit: "kg" },
+  { id: 36, name: "Kacang Tanah", unit: "kg" },
+  { id: 37, name: "Kedelai", unit: "kg" },
+  { id: 38, name: "Tahu", unit: "potong" },
+  { id: 39, name: "Tempe", unit: "potong" },
+  { id: 40, name: "Susu Kental Manis", unit: "kaleng" },
+  { id: 41, name: "Susu Bubuk", unit: "kotak" },
+  { id: 42, name: "Mentega", unit: "kg" },
+  { id: 43, name: "Garam", unit: "kg" },
+  { id: 44, name: "Merica", unit: "kg" },
+  { id: 45, name: "Kecap Manis", unit: "botol" },
+  { id: 46, name: "Kecap Asin", unit: "botol" },
+  { id: 47, name: "Saus Tomat", unit: "botol" },
+  { id: 48, name: "Mie Instan", unit: "bungkus" },
+  { id: 49, name: "Roti Tawar", unit: "bungkus" },
+  { id: 50, name: "Kerupuk", unit: "kg" }
+];
 
 interface CommodityPriceInput {
   commodityId: number;
@@ -43,39 +95,28 @@ const CommoditySurveyForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastSurveyDate, setLastSurveyDate] = useState<string>("");
 
-  const allCommodities = getCommodities();
-  const markets = getMarkets();
+  // Daftar pasar static (simplified untuk kepokmas)
+  const markets = [
+    { id: 1, name: "Pasar Beringharjo", address: "Jl. Malioboro, Yogyakarta", contact: "0274-123456" },
+    { id: 2, name: "Pasar Klewer", address: "Jl. Secang, Solo", contact: "0271-234567" },
+    { id: 3, name: "Pasar Gede", address: "Jl. Urip Sumoharjo, Solo", contact: "0271-345678" },
+  ];
 
-  // Get available commodities for selected market
-  const getAvailableCommoditiesForMarket = (marketId: number) => {
-    const marketCommodities = getMarketCommoditiesByMarket(marketId);
-    return allCommodities.filter(commodity => 
-      marketCommodities.some(mc => mc.commodityId === commodity.id && mc.availability)
-    );
-  };
-
-  // Initialize commodity inputs when market is selected
+  // Initialize commodity inputs when component mounts
   useEffect(() => {
-    if (selectedMarket) {
-      const marketId = parseInt(selectedMarket);
-      const availableCommodities = getAvailableCommoditiesForMarket(marketId);
-      
-      const initialInputs: CommodityPriceInput[] = availableCommodities.map(commodity => ({
-        commodityId: commodity.id,
-        commodityName: commodity.name,
-        unit: commodity.unit,
-        price: "",
-        stock: "available", // Default to "tersedia"
-        quality: "good", // Default to "baik"
-        notes: ""
-      }));
-      
-      setCommodityInputs(initialInputs);
-      setLastSurveyDate(new Date().toISOString().split('T')[0]);
-    } else {
-      setCommodityInputs([]);
-    }
-  }, [selectedMarket]);
+    const initialInputs: CommodityPriceInput[] = kepokmasItems.map(item => ({
+      commodityId: item.id,
+      commodityName: item.name,
+      unit: item.unit,
+      price: "",
+      stock: "available", // Default to "tersedia"
+      quality: "good", // Default to "baik"
+      notes: ""
+    }));
+    
+    setCommodityInputs(initialInputs);
+    setLastSurveyDate(new Date().toISOString().split('T')[0]);
+  }, []);
 
   // Update specific commodity input
   const updateCommodityInput = (commodityId: number, field: keyof CommodityPriceInput, value: string) => {
@@ -188,12 +229,12 @@ const CommoditySurveyForm = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Survey Harga Komoditas</h1>
-          <p className="text-muted-foreground">Input harga semua komoditas berdasarkan pasar yang dipilih</p>
+          <h1 className="text-3xl font-bold text-foreground">Survey Kepokmas</h1>
+          <p className="text-muted-foreground">Input harga 50 item kepokmas untuk monitoring harga pasar</p>
         </div>
         <Badge variant="outline" className="flex items-center space-x-2">
-          <MapPin className="w-4 h-4" />
-          <span>Mode Operator</span>
+          <ShoppingCart className="w-4 h-4" />
+          <span>Kepokmas Survey</span>
         </Badge>
       </div>
 
@@ -205,7 +246,7 @@ const CommoditySurveyForm = () => {
             Pilih Pasar Survey
           </CardTitle>
           <CardDescription>
-            Pilih pasar untuk melakukan survey harga komoditas
+            Pilih pasar untuk melakukan survey harga 50 item kepokmas
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -258,7 +299,7 @@ const CommoditySurveyForm = () => {
               </Badge>
             </CardTitle>
             <CardDescription>
-              Isi harga untuk semua komoditas yang tersedia di {selectedMarketData?.name}
+              Isi harga untuk 50 item kepokmas di {selectedMarketData?.name}
             </CardDescription>
           </CardHeader>
           <CardContent>
