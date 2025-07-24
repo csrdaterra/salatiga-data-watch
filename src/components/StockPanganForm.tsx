@@ -36,14 +36,20 @@ interface StockPanganData {
 
 const StockPanganForm = () => {
   const [data, setData] = useState<StockPanganData[]>([]);
-  const [operatorName, setOperatorName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [largeStores, setLargeStores] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     loadLargeStores();
+    getCurrentUser();
   }, []);
+
+  const getCurrentUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+  };
 
   const loadLargeStores = () => {
     try {
@@ -55,13 +61,22 @@ const StockPanganForm = () => {
   };
 
   const addNewRow = () => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "Anda harus login untuk menambah data",
+        variant: "destructive"
+      });
+      return;
+    }
+
     const newRow: StockPanganData = {
       survey_date: new Date().toISOString().split('T')[0],
       commodity_name: "",
       store_name: "",
       price: 0,
       stock_quantity: 0,
-      operator_name: operatorName,
+      operator_name: user.email || "Operator",
       notes: ""
     };
     setData([...data, newRow]);
@@ -79,15 +94,6 @@ const StockPanganForm = () => {
   };
 
   const handleSave = async () => {
-    if (!operatorName.trim()) {
-      toast({
-        title: "Error",
-        description: "Nama operator harus diisi",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (data.length === 0) {
       toast({
         title: "Error", 
@@ -152,7 +158,6 @@ const StockPanganForm = () => {
 
       // Reset form
       setData([]);
-      setOperatorName("");
 
     } catch (error) {
       console.error('Error saving data:', error);
@@ -183,23 +188,14 @@ const StockPanganForm = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="operator-name">Nama Operator</Label>
-            <Input
-              id="operator-name"
-              value={operatorName}
-              onChange={(e) => setOperatorName(e.target.value)}
-              placeholder="Masukkan nama operator"
-              className="mt-1"
-            />
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            {user ? `Operator: ${user.email}` : "Silakan login terlebih dahulu"}
           </div>
-          <div className="flex items-end">
-            <Button onClick={addNewRow} className="w-full">
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Data Stok
-            </Button>
-          </div>
+          <Button onClick={addNewRow} disabled={!user}>
+            <Plus className="w-4 h-4 mr-2" />
+            Tambah Data Stok
+          </Button>
         </div>
 
         {data.length > 0 && (
