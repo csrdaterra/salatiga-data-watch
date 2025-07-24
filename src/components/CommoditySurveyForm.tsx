@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Save, MapPin, DollarSign, RefreshCw } from "lucide-react";
 import { getCommodities, getMarketCommoditiesByMarket } from "@/stores/commodityStore";
 import { getMarkets } from "@/stores/marketStore";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CommodityPriceInput {
   commodityId: number;
@@ -122,26 +123,28 @@ const CommoditySurveyForm = () => {
     setIsSubmitting(true);
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
       // Prepare data for storage
-      const surveyData: PriceSurveyData[] = completedInputs.map(input => ({
+      const surveyData = completedInputs.map(input => ({
         market_id: parseInt(selectedMarket),
         commodity_id: input.commodityId,
         price: parseInt(input.price),
-        stock_status: input.stock as any,
-        quality: input.quality as any,
-        notes: input.notes || undefined,
+        stock_status: input.stock as 'available' | 'limited' | 'unavailable',
+        quality: input.quality as 'excellent' | 'good' | 'average' | 'poor',
+        notes: input.notes || null,
         survey_date: lastSurveyDate,
-        operator_name: "Operator Aktif" // This would come from authentication
+        operator_name: "Operator Aktif",
+        user_id: user?.id
       }));
 
-      // Store in localStorage for now
-      const existingSurveys = JSON.parse(localStorage.getItem('price_surveys') || '[]');
-      const updatedSurveys = [...existingSurveys, ...surveyData.map(data => ({
-        ...data,
-        id: `survey_${Date.now()}_${Math.random()}`,
-        created_at: new Date().toISOString()
-      }))];
-      localStorage.setItem('price_surveys', JSON.stringify(updatedSurveys));
+      // Save to Supabase
+      const { error } = await supabase
+        .from('price_surveys')
+        .insert(surveyData);
+
+      if (error) throw error;
 
       toast({
         title: "Survey Berhasil Disimpan",
@@ -159,11 +162,11 @@ const CommoditySurveyForm = () => {
         }))
       );
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting survey:', error);
       toast({
         title: "Error",
-        description: "Gagal menyimpan data survey",
+        description: error.message || "Gagal menyimpan data survey",
         variant: "destructive",
       });
     } finally {

@@ -215,6 +215,20 @@ const StockBapoktingForm = () => {
       return;
     }
 
+    // Validate that all required fields are filled
+    const incompleteRows = data.filter(row => 
+      !row.survey_date || !row.commodity_id || !row.store_name
+    );
+
+    if (incompleteRows.length > 0) {
+      toast({
+        title: "Error",
+        description: "Semua field tanggal, komoditas, dan nama toko harus diisi",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();

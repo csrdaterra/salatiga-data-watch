@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { getCommodities } from "@/stores/commodityStore";
 import { getMarkets } from "@/stores/marketStore";
 import { FileText, Search, Calendar, BarChart3, TrendingUp, Download } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import * as XLSX from 'xlsx';
 
 interface SurveyResult {
@@ -36,10 +37,45 @@ const SurveyResultsTable = () => {
   const allCommodities = getCommodities();
   const markets = getMarkets();
 
-  // Load surveys from localStorage
+  // Load surveys from Supabase
   useEffect(() => {
-    const savedSurveys = JSON.parse(localStorage.getItem('price_surveys') || '[]');
-    setSurveys(savedSurveys);
+    loadSurveys();
+  }, []);
+
+  const loadSurveys = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('price_surveys')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setSurveys((data || []) as SurveyResult[]);
+    } catch (error: any) {
+      console.error('Error loading surveys:', error);
+    }
+  };
+
+  // Set up real-time updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'price_surveys'
+        },
+        () => {
+          loadSurveys(); // Reload data when changes occur
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Get current date ranges based on time period

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 import { getCommodities } from "@/stores/commodityStore";
 import { getMarkets } from "@/stores/marketStore";
+import { supabase } from "@/integrations/supabase/client";
 import { TrendingUp, BarChart3, PieChart as PieChartIcon, Activity } from "lucide-react";
 
 interface SurveyResult {
@@ -30,9 +31,22 @@ const SurveyAnalytics = () => {
   const markets = getMarkets();
 
   useEffect(() => {
-    const savedSurveys = JSON.parse(localStorage.getItem('price_surveys') || '[]');
-    setSurveys(savedSurveys);
+    loadSurveys();
   }, []);
+
+  const loadSurveys = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('price_surveys')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setSurveys((data || []) as SurveyResult[]);
+    } catch (error: any) {
+      console.error('Error loading surveys:', error);
+    }
+  };
 
   // Filter surveys based on time period
   const getFilteredSurveys = () => {
