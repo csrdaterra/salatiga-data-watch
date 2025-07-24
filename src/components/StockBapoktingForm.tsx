@@ -244,7 +244,17 @@ const StockBapoktingForm = () => {
 
     setIsLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      // Check if user is authenticated
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        toast({
+          title: "Error Autentikasi",
+          description: "Anda harus login terlebih dahulu untuk menyimpan data",
+          variant: "destructive"
+        });
+        return;
+      }
       const dataToSave = data.map(row => ({
         ...row,
         operator_name: operatorName,
