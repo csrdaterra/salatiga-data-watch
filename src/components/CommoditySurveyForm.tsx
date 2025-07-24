@@ -65,8 +65,8 @@ const CommoditySurveyForm = () => {
         commodityName: commodity.name,
         unit: commodity.unit,
         price: "",
-        stock: "",
-        quality: "",
+        stock: "available", // Default to "tersedia"
+        quality: "good", // Default to "baik"
         notes: ""
       }));
       
@@ -151,13 +151,13 @@ const CommoditySurveyForm = () => {
         description: `${completedInputs.length} komoditas berhasil diperbarui secara real-time`,
       });
 
-      // Reset only the filled inputs
+      // Reset only the filled inputs but keep defaults for stock and quality
       setCommodityInputs(prev => 
         prev.map(input => ({
           ...input,
           price: "",
-          stock: "",
-          quality: "",
+          stock: "available", // Reset to default "tersedia"
+          quality: "good", // Reset to default "baik"
           notes: ""
         }))
       );
