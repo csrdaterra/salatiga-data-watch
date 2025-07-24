@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Download, Upload, Filter, BarChart3 } from "lucide-react";
+import { FileText, Download, Upload, Filter, BarChart3, Code, Copy, Eye, Plus, TrendingUp } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { PriceMonitoring } from "@/components/PriceMonitoring";
 import * as XLSX from "xlsx";
@@ -469,7 +469,7 @@ const Reports = () => {
 
       {/* Tabs for different views */}
       <Tabs defaultValue="monitoring" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="monitoring" className="flex items-center space-x-2">
             <BarChart3 className="w-4 h-4" />
             <span>Monitoring Harga</span>
@@ -481,6 +481,10 @@ const Reports = () => {
           <TabsTrigger value="accumulated" className="flex items-center space-x-2">
             <BarChart3 className="w-4 h-4" />
             <span>Akumulasi Stok</span>
+          </TabsTrigger>
+          <TabsTrigger value="api" className="flex items-center space-x-2">
+            <Code className="w-4 h-4" />
+            <span>Dokumentasi API</span>
           </TabsTrigger>
         </TabsList>
 
@@ -586,6 +590,292 @@ const Reports = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* API Documentation Tab */}
+        <TabsContent value="api">
+          <div className="space-y-6">
+            {/* API Overview */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code className="w-5 h-5" />
+                  Dokumentasi API Komoditas
+                </CardTitle>
+                <CardDescription>
+                  REST API untuk mengakses data harga komoditas dan survey pasar
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-semibold text-blue-900 mb-2">Base URL</h4>
+                    <code className="text-blue-700 bg-blue-100 px-2 py-1 rounded">
+                      https://snfgnsiyieognthvpyto.supabase.co/functions/v1/commodity-api
+                    </code>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 border rounded-lg">
+                      <h5 className="font-medium mb-2">Format Response</h5>
+                      <pre className="text-sm bg-gray-100 p-2 rounded overflow-x-auto">
+{`{
+  "success": true,
+  "data": [...],
+  "count": 100,
+  "timestamp": "2024-01-15T10:30:00Z"
+}`}
+                      </pre>
+                    </div>
+                    
+                    <div className="p-4 border rounded-lg">
+                      <h5 className="font-medium mb-2">Authentication</h5>
+                      <p className="text-sm text-muted-foreground mb-2">Header yang diperlukan:</p>
+                      <code className="text-xs bg-gray-100 p-2 rounded block">
+                        apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                      </code>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Endpoints Documentation */}
+            <div className="grid gap-6">
+              {/* GET Prices */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Eye className="w-4 h-4 text-green-600" />
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-mono">GET</span>
+                    /prices
+                  </CardTitle>
+                  <CardDescription>
+                    Mendapatkan data survey harga komoditas
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h5 className="font-medium mb-2">Query Parameters</h5>
+                    <div className="space-y-2 text-sm">
+                      <div className="grid grid-cols-3 gap-2">
+                        <code className="bg-gray-100 px-2 py-1 rounded">market_id</code>
+                        <span>integer</span>
+                        <span className="text-muted-foreground">ID pasar</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <code className="bg-gray-100 px-2 py-1 rounded">commodity_id</code>
+                        <span>integer</span>
+                        <span className="text-muted-foreground">ID komoditas</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <code className="bg-gray-100 px-2 py-1 rounded">date_from</code>
+                        <span>date</span>
+                        <span className="text-muted-foreground">Tanggal mulai (YYYY-MM-DD)</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <code className="bg-gray-100 px-2 py-1 rounded">date_to</code>
+                        <span>date</span>
+                        <span className="text-muted-foreground">Tanggal akhir (YYYY-MM-DD)</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <code className="bg-gray-100 px-2 py-1 rounded">limit</code>
+                        <span>integer</span>
+                        <span className="text-muted-foreground">Batas data (default: 100)</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h5 className="font-medium mb-2">Contoh Request</h5>
+                    <div className="relative">
+                      <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+{`curl -X GET "https://snfgnsiyieognthvpyto.supabase.co/functions/v1/commodity-api/prices?market_id=1&limit=10" \\
+  -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`}
+                      </pre>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="absolute top-2 right-2"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`curl -X GET "https://snfgnsiyieognthvpyto.supabase.co/functions/v1/commodity-api/prices?market_id=1&limit=10" -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`);
+                          toast({ title: "Copied!", description: "Request example copied to clipboard" });
+                        }}
+                      >
+                        <Copy className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* POST Prices */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Plus className="w-4 h-4 text-blue-600" />
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-mono">POST</span>
+                    /prices
+                  </CardTitle>
+                  <CardDescription>
+                    Menambahkan data survey harga baru
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h5 className="font-medium mb-2">Request Body</h5>
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+{`{
+  "market_id": 1,
+  "commodity_id": 5,
+  "price": 35000,
+  "stock_status": "available",
+  "quality": "good",
+  "survey_date": "2024-01-15",
+  "operator_name": "Admin",
+  "notes": "Kondisi baik"
+}`}
+                    </pre>
+                  </div>
+                  
+                  <div>
+                    <h5 className="font-medium mb-2">Nilai yang Valid</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <strong>stock_status:</strong>
+                        <ul className="list-disc list-inside text-muted-foreground">
+                          <li>available</li>
+                          <li>limited</li>
+                          <li>unavailable</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <strong>quality:</strong>
+                        <ul className="list-disc list-inside text-muted-foreground">
+                          <li>excellent</li>
+                          <li>good</li>
+                          <li>average</li>
+                          <li>poor</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* GET Latest */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-purple-600" />
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-mono">GET</span>
+                    /latest
+                  </CardTitle>
+                  <CardDescription>
+                    Mendapatkan harga terbaru per komoditas
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h5 className="font-medium mb-2">Query Parameters</h5>
+                    <div className="space-y-2 text-sm">
+                      <div className="grid grid-cols-3 gap-2">
+                        <code className="bg-gray-100 px-2 py-1 rounded">market_id</code>
+                        <span>integer</span>
+                        <span className="text-muted-foreground">Filter berdasarkan pasar (opsional)</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* GET Stats */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BarChart3 className="w-4 h-4 text-orange-600" />
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-mono">GET</span>
+                    /stats
+                  </CardTitle>
+                  <CardDescription>
+                    Mendapatkan statistik harga komoditas
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h5 className="font-medium mb-2">Query Parameters</h5>
+                    <div className="space-y-2 text-sm">
+                      <div className="grid grid-cols-3 gap-2">
+                        <code className="bg-gray-100 px-2 py-1 rounded">commodity_id</code>
+                        <span>integer</span>
+                        <span className="text-muted-foreground">ID komoditas (opsional)</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <code className="bg-gray-100 px-2 py-1 rounded">market_id</code>
+                        <span>integer</span>
+                        <span className="text-muted-foreground">ID pasar (opsional)</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <code className="bg-gray-100 px-2 py-1 rounded">period</code>
+                        <span>integer</span>
+                        <span className="text-muted-foreground">Periode hari (default: 30)</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h5 className="font-medium mb-2">Response</h5>
+                    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm">
+{`{
+  "success": true,
+  "data": {
+    "count": 45,
+    "avg_price": 34500,
+    "min_price": 30000,
+    "max_price": 40000,
+    "period_days": 30
+  }
+}`}
+                    </pre>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Error Codes */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Error Codes</CardTitle>
+                <CardDescription>
+                  Kode error yang mungkin dikembalikan oleh API
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 text-sm">
+                  <div className="grid grid-cols-3 gap-4">
+                    <code className="bg-red-100 text-red-800 px-2 py-1 rounded">400</code>
+                    <span className="font-medium">Bad Request</span>
+                    <span className="text-muted-foreground">Parameter tidak valid</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <code className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">401</code>
+                    <span className="font-medium">Unauthorized</span>
+                    <span className="text-muted-foreground">API key tidak valid</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <code className="bg-gray-100 text-gray-800 px-2 py-1 rounded">404</code>
+                    <span className="font-medium">Not Found</span>
+                    <span className="text-muted-foreground">Endpoint tidak ditemukan</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <code className="bg-red-100 text-red-800 px-2 py-1 rounded">500</code>
+                    <span className="font-medium">Server Error</span>
+                    <span className="text-muted-foreground">Kesalahan server internal</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
