@@ -140,6 +140,7 @@ const Markets = () => {
         name: data.name,
         description: data.description,
         unit: data.unit,
+        category: "lainnya",
       };
       addCommodity(newCommodity);
       setCommoditiesState(getCommodities());
