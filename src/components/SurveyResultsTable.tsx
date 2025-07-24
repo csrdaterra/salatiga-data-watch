@@ -5,9 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getCommodities } from "@/stores/commodityStore";
 import { getMarkets } from "@/stores/marketStore";
-import { FileText, Search } from "lucide-react";
+import { FileText, Search, Calendar, BarChart3, TrendingUp } from "lucide-react";
 
 interface SurveyResult {
   id: string;
@@ -28,6 +29,7 @@ const SurveyResultsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMarket, setSelectedMarket] = useState("all");
   const [selectedDate, setSelectedDate] = useState("");
+  const [timePeriod, setTimePeriod] = useState("daily");
 
   const allCommodities = getCommodities();
   const markets = getMarkets();
@@ -38,9 +40,47 @@ const SurveyResultsTable = () => {
     setSurveys(savedSurveys);
   }, []);
 
-  // Filter surveys based on search criteria
+  // Get current date ranges based on time period
+  const getDateRanges = () => {
+    const today = new Date();
+    const currentDate = today.toISOString().split('T')[0];
+    
+    // Get start of current week (Monday)
+    const startOfWeek = new Date(today);
+    const dayOfWeek = today.getDay();
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    startOfWeek.setDate(today.getDate() - daysToMonday);
+    const weekStart = startOfWeek.toISOString().split('T')[0];
+    
+    // Get end of current week (Sunday)
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    const weekEnd = endOfWeek.toISOString().split('T')[0];
+    
+    // Get start and end of current year
+    const yearStart = `${today.getFullYear()}-01-01`;
+    const yearEnd = `${today.getFullYear()}-12-31`;
+    
+    return { currentDate, weekStart, weekEnd, yearStart, yearEnd };
+  };
+
+  // Filter surveys based on time period and other criteria
   useEffect(() => {
     let filtered = surveys;
+    const { currentDate, weekStart, weekEnd, yearStart, yearEnd } = getDateRanges();
+
+    // Filter by time period
+    if (timePeriod === "daily") {
+      filtered = filtered.filter(survey => survey.survey_date === currentDate);
+    } else if (timePeriod === "weekly") {
+      filtered = filtered.filter(survey => 
+        survey.survey_date >= weekStart && survey.survey_date <= weekEnd
+      );
+    } else if (timePeriod === "yearly") {
+      filtered = filtered.filter(survey => 
+        survey.survey_date >= yearStart && survey.survey_date <= yearEnd
+      );
+    }
 
     // Filter by search term (commodity name)
     if (searchTerm) {
@@ -55,7 +95,7 @@ const SurveyResultsTable = () => {
       filtered = filtered.filter(survey => survey.market_id === parseInt(selectedMarket));
     }
 
-    // Filter by date
+    // Filter by specific date (if provided)
     if (selectedDate) {
       filtered = filtered.filter(survey => survey.survey_date === selectedDate);
     }
@@ -64,7 +104,7 @@ const SurveyResultsTable = () => {
     filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     setFilteredSurveys(filtered);
-  }, [surveys, searchTerm, selectedMarket, selectedDate, allCommodities]);
+  }, [surveys, searchTerm, selectedMarket, selectedDate, timePeriod, allCommodities]);
 
   const getStockBadgeVariant = (stock: string) => {
     switch (stock) {
@@ -117,6 +157,124 @@ const SurveyResultsTable = () => {
     return market?.name || 'Unknown';
   };
 
+  const renderSurveyTable = () => (
+    <div className="space-y-4">
+      {/* Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="space-y-2">
+          <Label>Cari Komoditas</Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              placeholder="Nama komoditas..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label>Pasar</Label>
+          <Select value={selectedMarket} onValueChange={setSelectedMarket}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Pasar</SelectItem>
+              {markets.map(market => (
+                <SelectItem key={market.id} value={market.id.toString()}>
+                  {market.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Filter Tanggal Tambahan</Label>
+          <Input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            placeholder="Pilih tanggal spesifik"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label>Total Data</Label>
+          <div className="flex items-center h-10 px-3 border rounded-md bg-muted">
+            <span className="text-sm text-muted-foreground">
+              {filteredSurveys.length} dari {surveys.length} survey
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Results Table */}
+      <div className="border rounded-lg overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Tanggal</TableHead>
+              <TableHead>Pasar</TableHead>
+              <TableHead>Komoditas</TableHead>
+              <TableHead>Harga</TableHead>
+              <TableHead>Stok</TableHead>
+              <TableHead>Kualitas</TableHead>
+              <TableHead>Operator</TableHead>
+              <TableHead>Catatan</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredSurveys.map((survey) => (
+              <TableRow key={survey.id}>
+                <TableCell>
+                  {new Date(survey.survey_date).toLocaleDateString('id-ID')}
+                </TableCell>
+                <TableCell className="font-medium">
+                  {getMarketName(survey.market_id)}
+                </TableCell>
+                <TableCell>
+                  {getCommodityName(survey.commodity_id)}
+                </TableCell>
+                <TableCell className="font-medium">
+                  Rp {survey.price.toLocaleString('id-ID')}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={getStockBadgeVariant(survey.stock_status)}>
+                    {getStockLabel(survey.stock_status)}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline">
+                    {getQualityLabel(survey.quality)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-sm">
+                  {survey.operator_name}
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground max-w-40 truncate">
+                  {survey.notes || '-'}
+                </TableCell>
+              </TableRow>
+            ))}
+            {filteredSurveys.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                  {surveys.length === 0 
+                    ? "Belum ada data survey" 
+                    : "Tidak ada survey yang sesuai dengan filter"
+                  }
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+
   return (
     <Card>
       <CardHeader>
@@ -125,122 +283,62 @@ const SurveyResultsTable = () => {
           Hasil Survey Harga Komoditas
         </CardTitle>
         <CardDescription>
-          Data survey harga yang telah diinput operator
+          Data survey harga dengan filter periode waktu
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="space-y-2">
-            <Label>Cari Komoditas</Label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Nama komoditas..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+      <CardContent>
+        <Tabs value={timePeriod} onValueChange={setTimePeriod} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="daily" className="flex items-center space-x-2">
+              <Calendar className="w-4 h-4" />
+              <span>Harian</span>
+            </TabsTrigger>
+            <TabsTrigger value="weekly" className="flex items-center space-x-2">
+              <BarChart3 className="w-4 h-4" />
+              <span>Mingguan</span>
+            </TabsTrigger>
+            <TabsTrigger value="yearly" className="flex items-center space-x-2">
+              <TrendingUp className="w-4 h-4" />
+              <span>Tahunan</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="daily">
+            <div className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-medium text-blue-900 mb-1">Survey Hari Ini</h3>
+                <p className="text-sm text-blue-700">
+                  Menampilkan data survey untuk tanggal: {new Date().toLocaleDateString('id-ID')}
+                </p>
+              </div>
+              {renderSurveyTable()}
             </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label>Pasar</Label>
-            <Select value={selectedMarket} onValueChange={setSelectedMarket}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Pasar</SelectItem>
-                {markets.map(market => (
-                  <SelectItem key={market.id} value={market.id.toString()}>
-                    {market.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          </TabsContent>
 
-          <div className="space-y-2">
-            <Label>Tanggal Survey</Label>
-            <Input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Total Data</Label>
-            <div className="flex items-center h-10 px-3 border rounded-md bg-muted">
-              <span className="text-sm text-muted-foreground">
-                {filteredSurveys.length} dari {surveys.length} survey
-              </span>
+          <TabsContent value="weekly">
+            <div className="space-y-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h3 className="font-medium text-green-900 mb-1">Survey Minggu Ini</h3>
+                <p className="text-sm text-green-700">
+                  Menampilkan data survey untuk minggu saat ini (Senin - Minggu)
+                </p>
+              </div>
+              {renderSurveyTable()}
             </div>
-          </div>
-        </div>
+          </TabsContent>
 
-        {/* Results Table */}
-        <div className="border rounded-lg overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tanggal</TableHead>
-                <TableHead>Pasar</TableHead>
-                <TableHead>Komoditas</TableHead>
-                <TableHead>Harga</TableHead>
-                <TableHead>Stok</TableHead>
-                <TableHead>Kualitas</TableHead>
-                <TableHead>Operator</TableHead>
-                <TableHead>Catatan</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredSurveys.map((survey) => (
-                <TableRow key={survey.id}>
-                  <TableCell>
-                    {new Date(survey.survey_date).toLocaleDateString('id-ID')}
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {getMarketName(survey.market_id)}
-                  </TableCell>
-                  <TableCell>
-                    {getCommodityName(survey.commodity_id)}
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    Rp {survey.price.toLocaleString('id-ID')}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getStockBadgeVariant(survey.stock_status)}>
-                      {getStockLabel(survey.stock_status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">
-                      {getQualityLabel(survey.quality)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {survey.operator_name}
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground max-w-40 truncate">
-                    {survey.notes || '-'}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {filteredSurveys.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                    {surveys.length === 0 
-                      ? "Belum ada data survey" 
-                      : "Tidak ada survey yang sesuai dengan filter"
-                    }
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+          <TabsContent value="yearly">
+            <div className="space-y-4">
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <h3 className="font-medium text-purple-900 mb-1">Survey Tahun Ini</h3>
+                <p className="text-sm text-purple-700">
+                  Menampilkan data survey untuk tahun {new Date().getFullYear()}
+                </p>
+              </div>
+              {renderSurveyTable()}
+            </div>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
