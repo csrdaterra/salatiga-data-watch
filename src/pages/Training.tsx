@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { 
   BookOpen, 
   PlayCircle, 
@@ -23,9 +24,12 @@ import {
   ArrowRight,
   Target,
   Clock,
-  Star
+  Star,
+  Download,
+  ExternalLink
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import jsPDF from 'jspdf';
 
 const Training = () => {
   const [activeModule, setActiveModule] = useState<string | null>(null);
@@ -38,6 +42,283 @@ const Training = () => {
   const markCompleted = (moduleId: string) => {
     if (!completedModules.includes(moduleId)) {
       setCompletedModules([...completedModules, moduleId]);
+    }
+  };
+
+  const downloadModulePDF = (module: any) => {
+    const pdf = new jsPDF();
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 20;
+    const maxWidth = pageWidth - (margin * 2);
+    let yPosition = margin;
+
+    // Header
+    pdf.setFontSize(20);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('SIMDAG Training Module', margin, yPosition);
+    yPosition += 15;
+
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(module.title, margin, yPosition);
+    yPosition += 10;
+
+    // Module info
+    pdf.setFontSize(10);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`Durasi: ${module.duration} | Level: ${module.level}`, margin, yPosition);
+    yPosition += 15;
+
+    // Description
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Deskripsi:', margin, yPosition);
+    yPosition += 8;
+
+    pdf.setFont('helvetica', 'normal');
+    const descLines = pdf.splitTextToSize(module.description, maxWidth);
+    pdf.text(descLines, margin, yPosition);
+    yPosition += descLines.length * 6 + 10;
+
+    // Overview
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Overview:', margin, yPosition);
+    yPosition += 8;
+
+    pdf.setFont('helvetica', 'normal');
+    const overviewLines = pdf.splitTextToSize(module.content.overview, maxWidth);
+    pdf.text(overviewLines, margin, yPosition);
+    yPosition += overviewLines.length * 6 + 10;
+
+    // Topics
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Topik Pembelajaran:', margin, yPosition);
+    yPosition += 8;
+
+    pdf.setFont('helvetica', 'normal');
+    module.topics.forEach((topic: string, index: number) => {
+      if (yPosition > pageHeight - 30) {
+        pdf.addPage();
+        yPosition = margin;
+      }
+      pdf.text(`${index + 1}. ${topic}`, margin + 5, yPosition);
+      yPosition += 6;
+    });
+
+    // Additional content based on module type
+    if (module.content.objectives) {
+      yPosition += 10;
+      if (yPosition > pageHeight - 30) {
+        pdf.addPage();
+        yPosition = margin;
+      }
+      
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Tujuan Pembelajaran:', margin, yPosition);
+      yPosition += 8;
+
+      pdf.setFont('helvetica', 'normal');
+      module.content.objectives.forEach((objective: string, index: number) => {
+        if (yPosition > pageHeight - 30) {
+          pdf.addPage();
+          yPosition = margin;
+        }
+        const objLines = pdf.splitTextToSize(`${index + 1}. ${objective}`, maxWidth - 10);
+        pdf.text(objLines, margin + 5, yPosition);
+        yPosition += objLines.length * 6 + 2;
+      });
+    }
+
+    if (module.content.roles) {
+      yPosition += 10;
+      if (yPosition > pageHeight - 30) {
+        pdf.addPage();
+        yPosition = margin;
+      }
+      
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Peran Pengguna:', margin, yPosition);
+      yPosition += 8;
+
+      module.content.roles.forEach((role: any) => {
+        if (yPosition > pageHeight - 50) {
+          pdf.addPage();
+          yPosition = margin;
+        }
+        
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`• ${role.role}`, margin + 5, yPosition);
+        yPosition += 6;
+        
+        pdf.setFont('helvetica', 'normal');
+        const roleDescLines = pdf.splitTextToSize(role.description, maxWidth - 15);
+        pdf.text(roleDescLines, margin + 10, yPosition);
+        yPosition += roleDescLines.length * 6;
+        
+        if (role.permissions) {
+          yPosition += 3;
+          pdf.setFont('helvetica', 'italic');
+          pdf.text('Permissions:', margin + 10, yPosition);
+          yPosition += 5;
+          
+          role.permissions.forEach((permission: string) => {
+            if (yPosition > pageHeight - 30) {
+              pdf.addPage();
+              yPosition = margin;
+            }
+            pdf.text(`- ${permission}`, margin + 15, yPosition);
+            yPosition += 5;
+          });
+        }
+        yPosition += 5;
+      });
+    }
+
+    // Footer
+    const totalPages = pdf.internal.pages.length - 1;
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(8);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(
+        `SIMDAG Training - ${module.title} | Halaman ${i} dari ${totalPages}`,
+        margin,
+        pageHeight - 10
+      );
+      pdf.text(
+        'Pemerintah Kota Salatiga',
+        pageWidth - margin - 40,
+        pageHeight - 10
+      );
+    }
+
+    // Save the PDF
+    pdf.save(`SIMDAG_Training_${module.id}.pdf`);
+  };
+
+  const viewModuleContent = (module: any) => {
+    // Create a new window with full module content
+    const newWindow = window.open('', '_blank');
+    if (newWindow) {
+      newWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>SIMDAG Training - ${module.title}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+            .header { border-bottom: 2px solid #ddd; margin-bottom: 20px; padding-bottom: 10px; }
+            .module-info { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+            .section { margin-bottom: 25px; }
+            .section h3 { color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+            ul { padding-left: 20px; }
+            li { margin-bottom: 5px; }
+            .role-section { background: #f9f9f9; padding: 10px; margin: 10px 0; border-radius: 5px; }
+            .permissions { font-style: italic; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>SIMDAG Training Module</h1>
+            <h2>${module.title}</h2>
+          </div>
+          
+          <div class="module-info">
+            <strong>Durasi:</strong> ${module.duration} | 
+            <strong>Level:</strong> ${module.level}
+          </div>
+          
+          <div class="section">
+            <h3>Deskripsi</h3>
+            <p>${module.description}</p>
+          </div>
+          
+          <div class="section">
+            <h3>Overview</h3>
+            <p>${module.content.overview}</p>
+          </div>
+          
+          <div class="section">
+            <h3>Topik Pembelajaran</h3>
+            <ul>
+              ${module.topics.map((topic: string) => `<li>${topic}</li>`).join('')}
+            </ul>
+          </div>
+          
+          ${module.content.objectives ? `
+            <div class="section">
+              <h3>Tujuan Pembelajaran</h3>
+              <ul>
+                ${module.content.objectives.map((obj: string) => `<li>${obj}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+          
+          ${module.content.roles ? `
+            <div class="section">
+              <h3>Peran Pengguna</h3>
+              ${module.content.roles.map((role: any) => `
+                <div class="role-section">
+                  <h4>${role.role}</h4>
+                  <p>${role.description}</p>
+                  ${role.permissions ? `
+                    <div class="permissions">
+                      <strong>Permissions:</strong>
+                      <ul>
+                        ${role.permissions.map((perm: string) => `<li>${perm}</li>`).join('')}
+                      </ul>
+                    </div>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+          
+          ${module.content.processes ? `
+            <div class="section">
+              <h3>Proses</h3>
+              <ul>
+                ${module.content.processes.map((process: string) => `<li>${process}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+          
+          ${module.content.features ? `
+            <div class="section">
+              <h3>Fitur</h3>
+              <ul>
+                ${module.content.features.map((feature: string) => `<li>${feature}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+          
+          ${module.content.reports ? `
+            <div class="section">
+              <h3>Jenis Laporan</h3>
+              <ul>
+                ${module.content.reports.map((report: string) => `<li>${report}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+          
+          ${module.content.mobileFeatures ? `
+            <div class="section">
+              <h3>Fitur Mobile</h3>
+              <ul>
+                ${module.content.mobileFeatures.map((feature: string) => `<li>${feature}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+          
+          <div class="section">
+            <hr>
+            <p><small>SIMDAG Training - Pemerintah Kota Salatiga</small></p>
+          </div>
+        </body>
+        </html>
+      `);
+      newWindow.document.close();
     }
   };
 
@@ -483,27 +764,54 @@ const Training = () => {
                           </ul>
                         </div>
 
-                        <div className="flex flex-col sm:flex-row gap-2 pt-4">
-                          <Button 
-                            size="sm" 
-                            className="flex-1 sm:flex-initial"
-                            onClick={() => markCompleted(module.id)}
-                            disabled={completedModules.includes(module.id)}
-                          >
-                            <PlayCircle className="w-4 h-4 mr-2" />
-                            {completedModules.includes(module.id) ? "Selesai" : "Mulai Belajar"}
-                          </Button>
-                          {!completedModules.includes(module.id) && (
+                        <Separator className="my-4" />
+                        
+                        <div className="space-y-3">
+                          <h4 className="font-semibold text-sm">Aksi Pembelajaran:</h4>
+                          
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                            <Button 
+                              size="sm" 
+                              className="w-full"
+                              onClick={() => markCompleted(module.id)}
+                              disabled={completedModules.includes(module.id)}
+                            >
+                              <PlayCircle className="w-4 h-4 mr-2" />
+                              {completedModules.includes(module.id) ? "Selesai" : "Mulai"}
+                            </Button>
+                            
                             <Button 
                               variant="outline" 
                               size="sm"
-                              className="flex-1 sm:flex-initial"
-                              onClick={() => markCompleted(module.id)}
+                              className="w-full"
+                              onClick={() => viewModuleContent(module)}
                             >
-                              <CheckCircle className="w-4 h-4 mr-2" />
-                              Tandai Selesai
+                              <ExternalLink className="w-4 h-4 mr-2" />
+                              Baca Detail
                             </Button>
-                          )}
+                            
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="w-full"
+                              onClick={() => downloadModulePDF(module)}
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              Download PDF
+                            </Button>
+                            
+                            {!completedModules.includes(module.id) && (
+                              <Button 
+                                variant="secondary" 
+                                size="sm"
+                                className="w-full"
+                                onClick={() => markCompleted(module.id)}
+                              >
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Tandai Selesai
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </CardContent>
