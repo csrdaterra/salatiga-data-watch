@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Download, Upload, Filter, BarChart3 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { PriceMonitoring } from "@/components/PriceMonitoring";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -467,8 +468,12 @@ const Reports = () => {
       </Card>
 
       {/* Tabs for different views */}
-      <Tabs defaultValue="detail" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs defaultValue="monitoring" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="monitoring" className="flex items-center space-x-2">
+            <BarChart3 className="w-4 h-4" />
+            <span>Monitoring Harga</span>
+          </TabsTrigger>
           <TabsTrigger value="detail" className="flex items-center space-x-2">
             <FileText className="w-4 h-4" />
             <span>Data Detail per Toko</span>
@@ -478,6 +483,11 @@ const Reports = () => {
             <span>Akumulasi Stok</span>
           </TabsTrigger>
         </TabsList>
+
+        {/* Price Monitoring Tab */}
+        <TabsContent value="monitoring">
+          <PriceMonitoring />
+        </TabsContent>
 
         {/* Detail Data Table */}
         <TabsContent value="detail">
