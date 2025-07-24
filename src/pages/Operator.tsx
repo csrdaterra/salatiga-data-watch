@@ -1,8 +1,10 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingCart, Package } from "lucide-react";
+import { ShoppingCart, Package, Eye, BarChart3 } from "lucide-react";
 import CommoditySurveyForm from "@/components/CommoditySurveyForm";
-import StockBapoktingForm from "@/components/StockBapoktingForm";
+import StockPanganForm from "@/components/StockPanganForm";
+import KepokmasPreviewTable from "@/components/KepokmasPreviewTable";
+import StockPanganPreviewTable from "@/components/StockPanganPreviewTable";
 
 function OperatorPage() {
   return (
@@ -15,7 +17,7 @@ function OperatorPage() {
       </div>
 
       <Tabs defaultValue="kepokmas" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="kepokmas" className="flex items-center space-x-2">
             <ShoppingCart className="w-4 h-4" />
             <span>Input Komoditas Kepokmas</span>
@@ -24,6 +26,14 @@ function OperatorPage() {
             <Package className="w-4 h-4" />
             <span>Input Stok Pangan</span>
           </TabsTrigger>
+          <TabsTrigger value="preview-kepokmas" className="flex items-center space-x-2">
+            <Eye className="w-4 h-4" />
+            <span>Preview Kepokmas</span>
+          </TabsTrigger>
+          <TabsTrigger value="preview-stock" className="flex items-center space-x-2">
+            <BarChart3 className="w-4 h-4" />
+            <span>Preview Stok Pangan</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="kepokmas">
@@ -31,7 +41,15 @@ function OperatorPage() {
         </TabsContent>
 
         <TabsContent value="stock-pangan">
-          <StockBapoktingForm />
+          <StockPanganForm />
+        </TabsContent>
+
+        <TabsContent value="preview-kepokmas">
+          <KepokmasPreviewTable />
+        </TabsContent>
+
+        <TabsContent value="preview-stock">
+          <StockPanganPreviewTable />
         </TabsContent>
       </Tabs>
     </div>
