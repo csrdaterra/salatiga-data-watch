@@ -15,6 +15,7 @@ import Markets from "./pages/admin/Markets";
 import LargeStores from "./pages/admin/LargeStores";
 import GasStations from "./pages/admin/GasStations";
 import Reports from "./pages/admin/Reports";
+import PriceMonitoring from "./pages/admin/PriceMonitoring";
 import LPGSubsidized from "./pages/admin/LPGSubsidized";
 import NotFound from "./pages/NotFound";
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="large-stores" element={<LargeStores />} />
             <Route path="gas-stations" element={<GasStations />} />
             <Route path="lpg-subsidized" element={<LPGSubsidized />} />
+            <Route path="price-monitoring" element={<PriceMonitoring />} />
             <Route path="reports" element={<Reports />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
