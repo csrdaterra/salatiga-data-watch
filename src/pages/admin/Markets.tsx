@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Edit, Trash2, Store, Package, Link, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, Store, Package, Link, Eye, Download, FileDown } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { getMarkets, setMarkets, type Market } from "@/stores/marketStore";
 import {
@@ -31,6 +31,7 @@ import {
   type CommodityCategory,
   type MarketCommodity
 } from "@/stores/commodityStore";
+import { downloadSampleMarketFile, downloadSampleCommodityFile } from "@/utils/sampleFileGenerator";
 
 const marketSchema = z.object({
   name: z.string().min(1, "Nama pasar wajib diisi"),
@@ -260,7 +261,15 @@ const Markets = () => {
         {/* Markets Tab */}
         <TabsContent value="markets">
           <div className="space-y-6">
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
+              <Button 
+                onClick={downloadSampleMarketFile} 
+                variant="outline" 
+                className="flex items-center space-x-2"
+              >
+                <FileDown className="w-4 h-4" />
+                <span>Download Sample</span>
+              </Button>
               <Dialog open={isMarketDialogOpen} onOpenChange={setIsMarketDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={handleAddNewMarket} className="flex items-center space-x-2">
@@ -470,7 +479,15 @@ const Markets = () => {
         {/* Commodities Tab */}
         <TabsContent value="commodities">
           <div className="space-y-6">
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-2">
+              <Button 
+                onClick={downloadSampleCommodityFile} 
+                variant="outline" 
+                className="flex items-center space-x-2"
+              >
+                <FileDown className="w-4 h-4" />
+                <span>Download Sample</span>
+              </Button>
               <Dialog open={isCommodityDialogOpen} onOpenChange={setIsCommodityDialogOpen}>
                 <DialogTrigger asChild>
                   <Button onClick={handleAddNewCommodity} className="flex items-center space-x-2">

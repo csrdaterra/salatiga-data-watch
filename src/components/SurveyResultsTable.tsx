@@ -9,9 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { getCommodities } from "@/stores/commodityStore";
 import { getMarkets } from "@/stores/marketStore";
-import { FileText, Search, Calendar, BarChart3, TrendingUp, Download } from "lucide-react";
+import { FileText, Search, Calendar, BarChart3, TrendingUp, Download, FileDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import * as XLSX from 'xlsx';
+import { downloadSampleSurveyFile } from "@/utils/sampleFileGenerator";
 
 interface SurveyResult {
   id: string;
@@ -299,7 +300,15 @@ const SurveyResultsTable = () => {
       </div>
 
       {/* Export Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
+        <Button 
+          onClick={downloadSampleSurveyFile} 
+          variant="outline" 
+          className="flex items-center gap-2"
+        >
+          <FileDown className="w-4 h-4" />
+          Download Sample
+        </Button>
         <Button onClick={exportToExcel} className="flex items-center gap-2">
           <Download className="w-4 h-4" />
           Export ke Excel

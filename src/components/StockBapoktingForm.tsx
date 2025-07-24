@@ -8,8 +8,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { getCommodities } from "@/stores/commodityStore";
-import { Upload, Download, Plus, Trash2 } from "lucide-react";
+import { Upload, Download, Plus, Trash2, FileDown } from "lucide-react";
 import * as XLSX from 'xlsx';
+import { downloadSampleStockBapoktingFile } from "@/utils/sampleFileGenerator";
 
 interface StockBapoktingData {
   id?: string;
@@ -283,7 +284,15 @@ const StockBapoktingForm = () => {
           </div>
 
           {/* Import/Export Buttons */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <Button
+              onClick={downloadSampleStockBapoktingFile}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <FileDown className="w-4 h-4" />
+              Download Sample
+            </Button>
             <Button
               onClick={() => fileInputRef.current?.click()}
               variant="outline"

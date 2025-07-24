@@ -20,7 +20,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Trash2, Fuel } from "lucide-react";
+import { Plus, Edit, Trash2, Fuel, FileDown } from "lucide-react";
+import { downloadSampleGasStationFile } from "@/utils/sampleFileGenerator";
 
 const gasStationSchema = z.object({
   name: z.string().min(1, "Nama SPBU harus diisi"),
@@ -128,61 +129,41 @@ const GasStations = () => {
           <h1 className="text-3xl font-bold text-foreground">SPBU Salatiga</h1>
           <p className="text-muted-foreground">Kelola informasi SPBU dan jenis BBM yang dijual</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={handleAddNew} className="flex items-center space-x-2">
-              <Plus className="w-4 h-4" />
-              <span>Tambah SPBU</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>
-                {editingGasStation ? "Edit SPBU" : "Tambah SPBU Baru"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingGasStation ? "Perbarui informasi SPBU" : "Tambahkan data SPBU baru"}
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nama SPBU</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Contoh: SPBU 44.507.16" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Alamat</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Masukkan alamat lengkap" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
+        <div className="flex gap-2">
+          <Button 
+            onClick={downloadSampleGasStationFile} 
+            variant="outline" 
+            className="flex items-center space-x-2"
+          >
+            <FileDown className="w-4 h-4" />
+            <span>Download Sample</span>
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={handleAddNew} className="flex items-center space-x-2">
+                <Plus className="w-4 h-4" />
+                <span>Tambah SPBU</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingGasStation ? "Edit SPBU" : "Tambah SPBU Baru"}
+                </DialogTitle>
+                <DialogDescription>
+                  {editingGasStation ? "Perbarui informasi SPBU" : "Tambahkan data SPBU baru"}
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="longitude"
+                    name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Longitude</FormLabel>
+                        <FormLabel>Nama SPBU</FormLabel>
                         <FormControl>
-                          <Input placeholder="110.4928" {...field} />
+                          <Input placeholder="Contoh: SPBU 44.507.16" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -191,103 +172,133 @@ const GasStations = () => {
                   
                   <FormField
                     control={form.control}
-                    name="latitude"
+                    name="address"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Latitude</FormLabel>
+                        <FormLabel>Alamat</FormLabel>
                         <FormControl>
-                          <Input placeholder="-7.3298" {...field} />
+                          <Input placeholder="Masukkan alamat lengkap" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </div>
 
-                <FormField
-                  control={form.control}
-                  name="fuelTypes"
-                  render={() => (
-                    <FormItem>
-                      <div className="mb-4">
-                        <FormLabel className="text-base">Jenis BBM yang Dijual</FormLabel>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        {FUEL_TYPES.map((fuelType) => (
-                          <FormField
-                            key={fuelType}
-                            control={form.control}
-                            name="fuelTypes"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={fuelType}
-                                  className="flex flex-row items-start space-x-3 space-y-0"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(fuelType)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([...field.value, fuelType])
-                                          : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== fuelType
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="longitude"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Longitude</FormLabel>
+                          <FormControl>
+                            <Input placeholder="110.4928" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="latitude"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Latitude</FormLabel>
+                          <FormControl>
+                            <Input placeholder="-7.3298" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="fuelTypes"
+                    render={() => (
+                      <FormItem>
+                        <div className="mb-4">
+                          <FormLabel className="text-base">Jenis BBM yang Dijual</FormLabel>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          {FUEL_TYPES.map((fuelType) => (
+                            <FormField
+                              key={fuelType}
+                              control={form.control}
+                              name="fuelTypes"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={fuelType}
+                                    className="flex flex-row items-start space-x-3 space-y-0"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(fuelType)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([...field.value, fuelType])
+                                            : field.onChange(
+                                                field.value?.filter(
+                                                  (value) => value !== fuelType
+                                                )
                                               )
-                                            )
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="text-sm font-normal">
-                                    {fuelType}
-                                  </FormLabel>
-                                </FormItem>
-                              )
-                            }}
-                          />
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="text-sm font-normal">
+                                      {fuelType}
+                                    </FormLabel>
+                                  </FormItem>
+                                )
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="kecamatan"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Kecamatan</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih kecamatan" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Sidorejo">Sidorejo</SelectItem>
-                          <SelectItem value="Sidomukti">Sidomukti</SelectItem>
-                          <SelectItem value="Tingkir">Tingkir</SelectItem>
-                          <SelectItem value="Argomulyo">Argomulyo</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="kecamatan"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kecamatan</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Pilih kecamatan" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Sidorejo">Sidorejo</SelectItem>
+                            <SelectItem value="Sidomukti">Sidomukti</SelectItem>
+                            <SelectItem value="Tingkir">Tingkir</SelectItem>
+                            <SelectItem value="Argomulyo">Argomulyo</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Batal
-                  </Button>
-                  <Button type="submit">
-                    {editingGasStation ? "Perbarui" : "Tambah"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Batal
+                    </Button>
+                    <Button type="submit">
+                      {editingGasStation ? "Perbarui" : "Tambah"}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Card>

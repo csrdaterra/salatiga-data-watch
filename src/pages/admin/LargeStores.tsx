@@ -8,8 +8,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Plus, Edit, Trash2, Building2 } from "lucide-react";
+import { Plus, Edit, Trash2, Building2, FileDown } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { downloadSampleLargeStoreFile } from "@/utils/sampleFileGenerator";
 
 const storeSchema = z.object({
   storeName: z.string().min(1, "Nama toko wajib diisi"),
@@ -225,98 +226,41 @@ const LargeStores = () => {
           <h1 className="text-3xl font-bold text-foreground">Toko Besar</h1>
           <p className="text-muted-foreground">Kelola informasi toko besar dan supermarket</p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={handleAddNew} className="flex items-center space-x-2">
-              <Plus className="w-4 h-4" />
-              <span>Tambah Toko</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>
-                {editingStore ? "Edit Toko Besar" : "Tambah Toko Besar Baru"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingStore ? "Perbarui informasi toko besar" : "Tambahkan data toko besar baru"}
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="storeName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nama Toko</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Masukkan nama toko" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="ownerName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nama Pemilik</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Masukkan nama pemilik" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Alamat</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Masukkan alamat toko" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="contact"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Kontak</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Masukkan nomor telepon" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="commodityName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nama Komoditas</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Contoh: Beras, Gula, Minyak Goreng" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="grid grid-cols-2 gap-4">
+        <div className="flex gap-2">
+          <Button 
+            onClick={downloadSampleLargeStoreFile} 
+            variant="outline" 
+            className="flex items-center space-x-2"
+          >
+            <FileDown className="w-4 h-4" />
+            <span>Download Sample</span>
+          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={handleAddNew} className="flex items-center space-x-2">
+                <Plus className="w-4 h-4" />
+                <span>Tambah Toko</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingStore ? "Edit Toko Besar" : "Tambah Toko Besar Baru"}
+                </DialogTitle>
+                <DialogDescription>
+                  {editingStore ? "Perbarui informasi toko besar" : "Tambahkan data toko besar baru"}
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="longitude"
+                    name="storeName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Longitude</FormLabel>
+                        <FormLabel>Nama Toko</FormLabel>
                         <FormControl>
-                          <Input placeholder="110.4872" {...field} />
+                          <Input placeholder="Masukkan nama toko" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -324,30 +268,97 @@ const LargeStores = () => {
                   />
                   <FormField
                     control={form.control}
-                    name="latitude"
+                    name="ownerName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Latitude</FormLabel>
+                        <FormLabel>Nama Pemilik</FormLabel>
                         <FormControl>
-                          <Input placeholder="-7.3313" {...field} />
+                          <Input placeholder="Masukkan nama pemilik" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </div>
-                <div className="flex justify-end space-x-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Batal
-                  </Button>
-                  <Button type="submit">
-                    {editingStore ? "Perbarui" : "Tambah"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Alamat</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Masukkan alamat toko" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contact"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kontak</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Masukkan nomor telepon" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="commodityName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nama Komoditas</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Contoh: Beras, Gula, Minyak Goreng" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="longitude"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Longitude</FormLabel>
+                          <FormControl>
+                            <Input placeholder="110.4872" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="latitude"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Latitude</FormLabel>
+                          <FormControl>
+                            <Input placeholder="-7.3313" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex justify-end space-x-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      Batal
+                    </Button>
+                    <Button type="submit">
+                      {editingStore ? "Perbarui" : "Tambah"}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Card>
