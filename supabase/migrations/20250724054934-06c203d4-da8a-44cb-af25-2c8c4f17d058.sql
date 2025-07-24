@@ -1,0 +1,51 @@
+-- Create price_surveys table for commodity price survey data
+CREATE TABLE public.price_surveys (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  market_id INTEGER NOT NULL,
+  commodity_id INTEGER NOT NULL,
+  price INTEGER NOT NULL,
+  stock_status TEXT NOT NULL CHECK (stock_status IN ('available', 'limited', 'unavailable')),
+  quality TEXT NOT NULL CHECK (quality IN ('excellent', 'good', 'average', 'poor')),
+  notes TEXT,
+  survey_date DATE NOT NULL DEFAULT CURRENT_DATE,
+  operator_name TEXT NOT NULL,
+  user_id UUID REFERENCES auth.users(id),
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+-- Enable Row Level Security
+ALTER TABLE public.price_surveys ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for price_surveys
+CREATE POLICY "Users can view all price surveys"
+ON public.price_surveys
+FOR SELECT
+USING (true);
+
+CREATE POLICY "Authenticated users can insert price surveys"
+ON public.price_surveys
+FOR INSERT
+WITH CHECK (auth.uid() IS NOT NULL);
+
+CREATE POLICY "Users can update their own surveys"
+ON public.price_surveys
+FOR UPDATE
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Admins can manage all surveys"
+ON public.price_surveys
+FOR ALL
+USING (public.has_role(auth.uid(), 'admin'));
+
+-- Create trigger for automatic timestamp updates
+CREATE TRIGGER update_price_surveys_updated_at
+BEFORE UPDATE ON public.price_surveys
+FOR EACH ROW
+EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Create indexes for better performance
+CREATE INDEX idx_price_surveys_market_id ON public.price_surveys(market_id);
+CREATE INDEX idx_price_surveys_commodity_id ON public.price_surveys(commodity_id);
+CREATE INDEX idx_price_surveys_survey_date ON public.price_surveys(survey_date);
+CREATE INDEX idx_price_surveys_user_id ON public.price_surveys(user_id);

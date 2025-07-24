@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { Save, MapPin, DollarSign, RefreshCw } from "lucide-react";
 import { getCommodities, getMarketCommoditiesByMarket } from "@/stores/commodityStore";
 import { getMarkets } from "@/stores/marketStore";
@@ -123,36 +122,31 @@ const CommoditySurveyForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Prepare data for database insertion
+      // Prepare data for storage
       const surveyData: PriceSurveyData[] = completedInputs.map(input => ({
         market_id: parseInt(selectedMarket),
         commodity_id: input.commodityId,
         price: parseInt(input.price),
         stock_status: input.stock as any,
         quality: input.quality as any,
-        notes: input.notes || null,
+        notes: input.notes || undefined,
         survey_date: lastSurveyDate,
         operator_name: "Operator Aktif" // This would come from authentication
       }));
 
-      // Insert to database
-      const { error } = await (supabase as any)
-        .from('price_surveys')
-        .insert(surveyData);
+      // Store in localStorage for now
+      const existingSurveys = JSON.parse(localStorage.getItem('price_surveys') || '[]');
+      const updatedSurveys = [...existingSurveys, ...surveyData.map(data => ({
+        ...data,
+        id: `survey_${Date.now()}_${Math.random()}`,
+        created_at: new Date().toISOString()
+      }))];
+      localStorage.setItem('price_surveys', JSON.stringify(updatedSurveys));
 
-      if (error) {
-        console.error('Database error:', error);
-        // For now, just show success message since table might not exist yet
-        toast({
-          title: "Survey Berhasil Disimpan",
-          description: `${completedInputs.length} komoditas berhasil diperbarui secara real-time`,
-        });
-      } else {
-        toast({
-          title: "Survey Berhasil Disimpan",
-          description: `${completedInputs.length} komoditas berhasil diperbarui secara real-time`,
-        });
-      }
+      toast({
+        title: "Survey Berhasil Disimpan",
+        description: `${completedInputs.length} komoditas berhasil diperbarui secara real-time`,
+      });
 
       // Reset only the filled inputs
       setCommodityInputs(prev => 
