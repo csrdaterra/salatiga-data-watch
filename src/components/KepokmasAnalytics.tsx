@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import { 
   TrendingUp, TrendingDown, BarChart3, Calendar, MapPin, 
-  DollarSign, Package, Activity, AlertTriangle, CheckCircle 
+  DollarSign, Package, Activity, AlertTriangle, CheckCircle, Building2 
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -52,6 +52,43 @@ interface DailyTrend {
   available_count: number;
   limited_count: number;
   unavailable_count: number;
+}
+
+interface StockBapoktingData {
+  id: string;
+  survey_date: string;
+  commodity_id: number;
+  store_name: string;
+  january_capaian: number;
+  february: number;
+  march: number;
+  april: number;
+  may: number;
+  june: number;
+  july: number;
+  august: number;
+  september: number;
+  october: number;
+  november: number;
+  december: number;
+  operator_name: string;
+  created_at: string;
+}
+
+interface WeeklyComparisonData {
+  commodity_name: string;
+  thisWeek: number;
+  lastWeek: number;
+  change: number;
+  changePercent: number;
+  trend: 'up' | 'down' | 'stable';
+}
+
+interface LargeStoreStockTrend {
+  date: string;
+  totalStock: number;
+  averageStock: number;
+  storeCount: number;
 }
 
 // Daftar 50 item Kepokmas
@@ -119,6 +156,9 @@ const KepokmasAnalytics = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [priceStatistics, setPriceStatistics] = useState<PriceStatistics[]>([]);
   const [dailyTrends, setDailyTrends] = useState<DailyTrend[]>([]);
+  const [stockBapoktingData, setStockBapoktingData] = useState<StockBapoktingData[]>([]);
+  const [weeklyComparison, setWeeklyComparison] = useState<WeeklyComparisonData[]>([]);
+  const [largeStoreStockTrends, setLargeStoreStockTrends] = useState<LargeStoreStockTrend[]>([]);
 
   // Fetch markets
   useEffect(() => {
@@ -164,6 +204,7 @@ const KepokmasAnalytics = () => {
         // Process statistics
         processStatistics(data || []);
         processDailyTrends(data || []);
+        processWeeklyComparison(data || []);
         
       } catch (error: any) {
         console.error('Error fetching survey data:', error);
@@ -179,6 +220,28 @@ const KepokmasAnalytics = () => {
 
     fetchSurveyData();
   }, [selectedMarket, selectedPeriod]);
+
+  // Fetch stock bapokting data for large stores analysis
+  useEffect(() => {
+    const fetchStockBapoktingData = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('stock_bapokting')
+          .select('*')
+          .gte('survey_date', new Date(Date.now() - parseInt(selectedPeriod) * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+          .order('survey_date', { ascending: false });
+
+        if (error) throw error;
+        setStockBapoktingData(data || []);
+        processLargeStoreStockTrends(data || []);
+        
+      } catch (error: any) {
+        console.error('Error fetching stock bapokting data:', error);
+      }
+    };
+
+    fetchStockBapoktingData();
+  }, [selectedPeriod]);
 
   const processStatistics = (data: SurveyData[]) => {
     const stats: { [key: number]: any } = {};
@@ -256,6 +319,90 @@ const KepokmasAnalytics = () => {
     })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     setDailyTrends(trends);
+  };
+
+  const processWeeklyComparison = (data: SurveyData[]) => {
+    // Get data from last 14 days to compare 2 weeks
+    const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const now = new Date();
+
+    // Filter data by markets (take first 3 markets for comparison)
+    const selectedMarkets = markets.slice(0, 3).map(m => m.id);
+    const filteredData = data.filter(survey => 
+      selectedMarkets.includes(survey.market_id) &&
+      new Date(survey.survey_date) >= twoWeeksAgo
+    );
+
+    // Group by commodity and week
+    const commodityWeeklyData: { [key: number]: { thisWeek: number[], lastWeek: number[] } } = {};
+
+    filteredData.forEach(survey => {
+      const surveyDate = new Date(survey.survey_date);
+      if (!commodityWeeklyData[survey.commodity_id]) {
+        commodityWeeklyData[survey.commodity_id] = { thisWeek: [], lastWeek: [] };
+      }
+
+      if (surveyDate >= oneWeekAgo && surveyDate <= now) {
+        commodityWeeklyData[survey.commodity_id].thisWeek.push(survey.price);
+      } else if (surveyDate >= twoWeeksAgo && surveyDate < oneWeekAgo) {
+        commodityWeeklyData[survey.commodity_id].lastWeek.push(survey.price);
+      }
+    });
+
+    const weeklyComparisonData: WeeklyComparisonData[] = Object.entries(commodityWeeklyData)
+      .filter(([_, data]) => data.thisWeek.length > 0 && data.lastWeek.length > 0)
+      .map(([commodityId, data]) => {
+        const commodity = kepokmasItems.find(item => item.id === parseInt(commodityId));
+        const thisWeekSum = data.thisWeek.reduce((sum, price) => sum + price, 0);
+        const lastWeekSum = data.lastWeek.reduce((sum, price) => sum + price, 0);
+        const change = thisWeekSum - lastWeekSum;
+        const changePercent = lastWeekSum > 0 ? (change / lastWeekSum) * 100 : 0;
+
+        return {
+          commodity_name: commodity?.name || `Komoditas ${commodityId}`,
+          thisWeek: thisWeekSum,
+          lastWeek: lastWeekSum,
+          change,
+          changePercent,
+          trend: (change > 0 ? 'up' : change < 0 ? 'down' : 'stable') as 'up' | 'down' | 'stable'
+        };
+      })
+      .sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent))
+      .slice(0, 15);
+
+    setWeeklyComparison(weeklyComparisonData);
+  };
+
+  const processLargeStoreStockTrends = (data: StockBapoktingData[]) => {
+    const dailyStockData: { [key: string]: { totalStock: number, storeCount: number } } = {};
+    
+    data.forEach(stock => {
+      const date = stock.survey_date;
+      if (!dailyStockData[date]) {
+        dailyStockData[date] = { totalStock: 0, storeCount: 0 };
+      }
+
+      // Sum all monthly stock data
+      const monthlyTotal = stock.january_capaian + stock.february + stock.march + 
+                          stock.april + stock.may + stock.june + stock.july + 
+                          stock.august + stock.september + stock.october + 
+                          stock.november + stock.december;
+
+      dailyStockData[date].totalStock += monthlyTotal;
+      dailyStockData[date].storeCount++;
+    });
+
+    const trends: LargeStoreStockTrend[] = Object.entries(dailyStockData)
+      .map(([date, data]) => ({
+        date,
+        totalStock: data.totalStock,
+        averageStock: data.storeCount > 0 ? data.totalStock / data.storeCount : 0,
+        storeCount: data.storeCount
+      }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    setLargeStoreStockTrends(trends);
   };
 
   const getOverallStats = () => {
@@ -391,48 +538,120 @@ const KepokmasAnalytics = () => {
       </div>
 
       {/* Analytics Tabs */}
-      <Tabs defaultValue="trends" className="space-y-4">
+      <Tabs defaultValue="stock-trends" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="trends">Tren Harian</TabsTrigger>
+          <TabsTrigger value="stock-trends">Stok Toko Besar</TabsTrigger>
           <TabsTrigger value="commodities">Statistik Komoditas</TabsTrigger>
           <TabsTrigger value="distribution">Distribusi Stok</TabsTrigger>
-          <TabsTrigger value="comparison">Perbandingan Harga</TabsTrigger>
+          <TabsTrigger value="weekly-comparison">Perbandingan Mingguan</TabsTrigger>
         </TabsList>
 
-        {/* Daily Trends */}
-        <TabsContent value="trends">
+        {/* Large Store Stock Trends */}
+        <TabsContent value="stock-trends">
           <Card>
             <CardHeader>
-              <CardTitle>Tren Harga Harian</CardTitle>
+              <CardTitle className="flex items-center">
+                <Building2 className="w-5 h-5 mr-2" />
+                Analisis Stok Pangan dari Toko Besar per 7 Hari
+              </CardTitle>
               <CardDescription>
-                Perkembangan rata-rata harga komoditas per hari
+                Analisis perkembangan stok pangan dari toko besar dan distributor berdasarkan data Bapokting
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={dailyTrends}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="date" 
-                      tickFormatter={(value) => new Date(value).toLocaleDateString('id-ID')}
-                    />
-                    <YAxis 
-                      tickFormatter={(value) => `Rp ${value.toLocaleString('id-ID')}`}
-                    />
-                    <Tooltip 
-                      labelFormatter={(value) => new Date(value).toLocaleDateString('id-ID')}
-                      formatter={(value: any) => [`Rp ${value.toLocaleString('id-ID')}`, 'Rata-rata Harga']}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="avg_price" 
-                      stroke="#8884d8" 
-                      fill="#8884d8" 
-                      fillOpacity={0.6}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <div className="space-y-6">
+                {/* Stock Trend Chart */}
+                <div className="h-[400px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={largeStoreStockTrends}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="date" 
+                        tickFormatter={(value) => new Date(value).toLocaleDateString('id-ID')}
+                      />
+                      <YAxis />
+                      <Tooltip 
+                        labelFormatter={(value) => new Date(value).toLocaleDateString('id-ID')}
+                        formatter={(value: any, name: string) => [
+                          name === 'totalStock' ? `${value.toLocaleString('id-ID')} unit` : 
+                          name === 'averageStock' ? `${value.toLocaleString('id-ID', { maximumFractionDigits: 1 })} unit` :
+                          `${value} toko`,
+                          name === 'totalStock' ? 'Total Stok' : 
+                          name === 'averageStock' ? 'Rata-rata Stok per Toko' : 'Jumlah Toko'
+                        ]}
+                      />
+                      <Legend />
+                      <Line 
+                        type="monotone" 
+                        dataKey="totalStock" 
+                        stroke="#8884d8" 
+                        strokeWidth={3}
+                        name="Total Stok"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="averageStock" 
+                        stroke="#82ca9d" 
+                        strokeWidth={3}
+                        name="Rata-rata Stok per Toko"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Summary Statistics */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Total Stok Terkini</p>
+                          <p className="text-2xl font-bold">
+                            {largeStoreStockTrends.length > 0 
+                              ? largeStoreStockTrends[largeStoreStockTrends.length - 1]?.totalStock.toLocaleString('id-ID')
+                              : '0'
+                            } unit
+                          </p>
+                        </div>
+                        <Package className="w-8 h-8 text-blue-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Rata-rata per Toko</p>
+                          <p className="text-2xl font-bold">
+                            {largeStoreStockTrends.length > 0 
+                              ? largeStoreStockTrends[largeStoreStockTrends.length - 1]?.averageStock.toLocaleString('id-ID', { maximumFractionDigits: 1 })
+                              : '0'
+                            } unit
+                          </p>
+                        </div>
+                        <BarChart3 className="w-8 h-8 text-green-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Toko Pelapor</p>
+                          <p className="text-2xl font-bold">
+                            {largeStoreStockTrends.length > 0 
+                              ? largeStoreStockTrends[largeStoreStockTrends.length - 1]?.storeCount || 0
+                              : '0'
+                            } toko
+                          </p>
+                        </div>
+                        <Building2 className="w-8 h-8 text-orange-500" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -544,42 +763,72 @@ const KepokmasAnalytics = () => {
           </div>
         </TabsContent>
 
-        {/* Price Comparison */}
-        <TabsContent value="comparison">
+        {/* Weekly Comparison */}
+        <TabsContent value="weekly-comparison">
           <Card>
             <CardHeader>
-              <CardTitle>Perbandingan Harga Top 10 Komoditas</CardTitle>
+              <CardTitle className="flex items-center">
+                <TrendingUp className="w-5 h-5 mr-2" />
+                Analisis Perbandingan Mingguan
+              </CardTitle>
               <CardDescription>
-                Komoditas dengan survey terbanyak dan perbandingan harganya
+                Perbandingan mingguan dari total penjumlahan harga 3 pasar untuk 50 komoditas kepokmas setiap minggu
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart 
-                    data={priceStatistics
-                      .sort((a, b) => b.survey_count - a.survey_count)
-                      .slice(0, 10)
-                    }
-                    layout="horizontal"
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      type="number"
-                      tickFormatter={(value) => `Rp ${value.toLocaleString('id-ID')}`}
-                    />
-                    <YAxis 
-                      type="category"
-                      dataKey="commodity_name" 
-                      width={150}
-                      tick={{ fontSize: 12 }}
-                    />
-                    <Tooltip 
-                      formatter={(value: any) => [`Rp ${value.toLocaleString('id-ID')}`, 'Rata-rata Harga']}
-                    />
-                    <Bar dataKey="avg_price" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
+              <div className="space-y-4">
+                {weeklyComparison.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {weeklyComparison.map((item, index) => (
+                      <div key={index} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-sm">{item.commodity_name}</h4>
+                          <Badge 
+                            variant={item.trend === 'up' ? 'destructive' : item.trend === 'down' ? 'default' : 'secondary'}
+                            className="flex items-center space-x-1"
+                          >
+                            {item.trend === 'up' && <TrendingUp className="w-3 h-3" />}
+                            {item.trend === 'down' && <TrendingDown className="w-3 h-3" />}
+                            <span>{item.changePercent.toFixed(1)}%</span>
+                          </Badge>
+                        </div>
+                        
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Total Minggu Ini:</span>
+                            <span className="font-medium">Rp {item.thisWeek.toLocaleString('id-ID')}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Total Minggu Lalu:</span>
+                            <span className="font-medium">Rp {item.lastWeek.toLocaleString('id-ID')}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Perubahan:</span>
+                            <span className={`font-medium ${item.change >= 0 ? 'text-red-600' : 'text-green-600'}`}>
+                              {item.change >= 0 ? '+' : ''}Rp {item.change.toLocaleString('id-ID')}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="text-xs text-muted-foreground pt-2 border-t">
+                          {item.trend === 'up' && Math.abs(item.changePercent) > 10 
+                            ? "⚠️ Kenaikan signifikan, perlu monitoring"
+                            : item.trend === 'down' && Math.abs(item.changePercent) > 10
+                            ? "📉 Penurunan signifikan, harga lebih terjangkau"
+                            : "✅ Pergerakan normal dalam batas wajar"
+                          }
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground">Tidak ada data perbandingan mingguan tersedia</p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Data memerlukan survey dari minimal 3 pasar untuk periode 2 minggu
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
