@@ -5,10 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { getLargeStores } from "@/stores/largeStoreStore";
-import { Plus, Trash2, Save } from "lucide-react";
+import { Plus, Trash2, Save, Store, Package2 } from "lucide-react";
 
 // 9 komoditas stok pangan yang disebutkan user
 const stockPanganCommodities = [
@@ -35,7 +37,9 @@ interface StockPanganData {
 }
 
 const StockPanganForm = () => {
-  const [data, setData] = useState<StockPanganData[]>([]);
+  const [selectedStore, setSelectedStore] = useState<string>("");
+  const [surveyDate, setSurveyDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [commodityInputs, setCommodityInputs] = useState<Record<string, { price: number; stock_quantity: number; notes: string }>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [largeStores, setLargeStores] = useState<any[]>([]);
   const [user, setUser] = useState<any>(null);
@@ -60,58 +64,45 @@ const StockPanganForm = () => {
     }
   };
 
-  const addNewRow = () => {
-    if (!user) {
-      toast({
-        title: "Error",
-        description: "Anda harus login untuk menambah data",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const newRow: StockPanganData = {
-      survey_date: new Date().toISOString().split('T')[0],
-      commodity_name: "",
-      store_name: "",
-      price: 0,
-      stock_quantity: 0,
-      operator_name: user.email || "Operator",
-      notes: ""
-    };
-    setData([...data, newRow]);
+  const updateCommodityInput = (commodityId: string, field: string, value: any) => {
+    setCommodityInputs(prev => ({
+      ...prev,
+      [commodityId]: {
+        ...prev[commodityId],
+        [field]: value
+      }
+    }));
   };
 
-  const removeRow = (index: number) => {
-    const newData = data.filter((_, i) => i !== index);
-    setData(newData);
+  const isCommodityComplete = (commodityId: string) => {
+    const input = commodityInputs[commodityId];
+    return input && input.price > 0 && input.stock_quantity >= 0;
   };
 
-  const updateRow = (index: number, field: keyof StockPanganData, value: any) => {
-    const newData = [...data];
-    newData[index] = { ...newData[index], [field]: value };
-    setData(newData);
+  const getCompletedCount = () => {
+    return stockPanganCommodities.filter(commodity => 
+      isCommodityComplete(commodity.id)
+    ).length;
   };
 
   const handleSave = async () => {
-    if (data.length === 0) {
+    if (!selectedStore) {
       toast({
-        title: "Error", 
-        description: "Tidak ada data untuk disimpan",
+        title: "Error",
+        description: "Pilih toko terlebih dahulu",
         variant: "destructive"
       });
       return;
     }
 
-    // Validate data
-    const invalidRows = data.filter(row => 
-      !row.commodity_name || !row.store_name || row.price <= 0
+    const completedInputs = stockPanganCommodities.filter(commodity => 
+      isCommodityComplete(commodity.id)
     );
 
-    if (invalidRows.length > 0) {
+    if (completedInputs.length === 0) {
       toast({
-        title: "Error",
-        description: "Semua field wajib diisi dan harga harus lebih dari 0",
+        title: "Error", 
+        description: "Minimal satu komoditas harus diisi",
         variant: "destructive"
       });
       return;
@@ -133,17 +124,20 @@ const StockPanganForm = () => {
 
       // Since we don't have a specific table for stock pangan, we'll create the data
       // You might want to create a specific table for this or modify existing table
-      const stockPanganData = data.map(row => ({
-        survey_date: row.survey_date,
-        commodity_name: row.commodity_name,
-        store_name: row.store_name,
-        price: row.price,
-        stock_quantity: row.stock_quantity,
-        operator_name: row.operator_name,
-        notes: row.notes,
-        user_id: user.id,
-        created_at: new Date().toISOString()
-      }));
+      const stockPanganData = completedInputs.map(commodity => {
+        const input = commodityInputs[commodity.id];
+        return {
+          survey_date: surveyDate,
+          commodity_name: commodity.name,
+          store_name: selectedStore,
+          price: input.price,
+          stock_quantity: input.stock_quantity,
+          operator_name: user.email || "Operator",
+          notes: input.notes || "",
+          user_id: user.id,
+          created_at: new Date().toISOString()
+        };
+      });
 
       // For now, we'll store in browser localStorage as demo
       // In production, you should create a proper database table
@@ -153,11 +147,13 @@ const StockPanganForm = () => {
 
       toast({
         title: "Success",
-        description: `Berhasil menyimpan ${data.length} data stok pangan`,
+        description: `Berhasil menyimpan ${completedInputs.length} data stok pangan untuk ${selectedStore}`,
       });
 
       // Reset form
-      setData([]);
+      setCommodityInputs({});
+      setSelectedStore("");
+      setSurveyDate(new Date().toISOString().split('T')[0]);
 
     } catch (error) {
       console.error('Error saving data:', error);
@@ -183,142 +179,154 @@ const StockPanganForm = () => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <Plus className="w-5 h-5" />
-          <span>Input Stok Pangan</span>
+          <Package2 className="w-5 h-5" />
+          <span>Input Stok Pangan per Toko Besar</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
-            {user ? `Operator: ${user.email}` : "Silakan login terlebih dahulu"}
+        {/* Store Selection and Date */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="survey-date">Tanggal Survey</Label>
+            <Input
+              id="survey-date"
+              type="date"
+              value={surveyDate}
+              onChange={(e) => setSurveyDate(e.target.value)}
+              className="mt-1"
+            />
           </div>
-          <Button onClick={addNewRow} disabled={!user}>
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Data Stok
-          </Button>
+          <div>
+            <Label htmlFor="store-select">Pilih Toko Besar</Label>
+            <Select value={selectedStore} onValueChange={setSelectedStore}>
+              <SelectTrigger id="store-select" className="mt-1">
+                <SelectValue placeholder="Pilih toko besar" />
+              </SelectTrigger>
+              <SelectContent>
+                {largeStores.map((store) => (
+                  <SelectItem key={store.id} value={store.storeName}>
+                    <div className="flex items-center space-x-2">
+                      <Store className="w-4 h-4" />
+                      <span>{store.storeName}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-end">
+            <div className="text-sm text-muted-foreground w-full">
+              {user ? `Operator: ${user.email}` : "Silakan login terlebih dahulu"}
+            </div>
+          </div>
         </div>
 
-        {data.length > 0 && (
-          <div className="space-y-4">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tanggal</TableHead>
-                    <TableHead>Komoditas</TableHead>
-                    <TableHead>Toko Besar</TableHead>
-                    <TableHead>Harga</TableHead>
-                    <TableHead>Stok</TableHead>
-                    <TableHead>Catatan</TableHead>
-                    <TableHead>Aksi</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.map((row, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <Input
-                          type="date"
-                          value={row.survey_date}
-                          onChange={(e) => updateRow(index, 'survey_date', e.target.value)}
-                          className="w-full"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={row.commodity_name}
-                          onValueChange={(value) => updateRow(index, 'commodity_name', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih komoditas" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {stockPanganCommodities.map((commodity) => (
-                              <SelectItem key={commodity.id} value={commodity.name}>
-                                {commodity.name} ({commodity.unit})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={row.store_name}
-                          onValueChange={(value) => updateRow(index, 'store_name', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Pilih toko" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {largeStores.map((store) => (
-                              <SelectItem key={store.id} value={store.storeName}>
-                                {store.storeName}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          value={row.price}
-                          onChange={(e) => updateRow(index, 'price', parseFloat(e.target.value) || 0)}
-                          placeholder="Harga"
-                          className="w-full"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          value={row.stock_quantity}
-                          onChange={(e) => updateRow(index, 'stock_quantity', parseFloat(e.target.value) || 0)}
-                          placeholder="Jumlah stok"
-                          className="w-full"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          value={row.notes || ""}
-                          onChange={(e) => updateRow(index, 'notes', e.target.value)}
-                          placeholder="Catatan (opsional)"
-                          className="w-full"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          onClick={() => removeRow(index)}
-                          variant="destructive"
-                          size="sm"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+        {selectedStore && (
+          <>
+            {/* Progress Information */}
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Progress Input Komoditas</span>
+                <Badge variant={getCompletedCount() === stockPanganCommodities.length ? "default" : "secondary"}>
+                  {getCompletedCount()}/{stockPanganCommodities.length} selesai
+                </Badge>
+              </div>
+              <div className="w-full bg-background rounded-full h-2">
+                <div 
+                  className="bg-primary h-2 rounded-full transition-all duration-300" 
+                  style={{ width: `${(getCompletedCount() / stockPanganCommodities.length) * 100}%` }}
+                ></div>
+              </div>
             </div>
 
+            {/* Commodity Input Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Input Stok Komoditas - {selectedStore}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Komoditas</TableHead>
+                        <TableHead>Unit</TableHead>
+                        <TableHead>Harga (Rp)</TableHead>
+                        <TableHead>Stok</TableHead>
+                        <TableHead>Catatan</TableHead>
+                        <TableHead>Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {stockPanganCommodities.map((commodity) => {
+                        const input = commodityInputs[commodity.id] || { price: 0, stock_quantity: 0, notes: "" };
+                        const isComplete = isCommodityComplete(commodity.id);
+                        
+                        return (
+                          <TableRow key={commodity.id} className={isComplete ? "bg-green-50" : ""}>
+                            <TableCell className="font-medium">{commodity.name}</TableCell>
+                            <TableCell>{commodity.unit}</TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                value={input.price || ""}
+                                onChange={(e) => updateCommodityInput(commodity.id, 'price', parseFloat(e.target.value) || 0)}
+                                placeholder="0"
+                                className="w-24"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                value={input.stock_quantity || ""}
+                                onChange={(e) => updateCommodityInput(commodity.id, 'stock_quantity', parseFloat(e.target.value) || 0)}
+                                placeholder="0"
+                                className="w-24"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                value={input.notes || ""}
+                                onChange={(e) => updateCommodityInput(commodity.id, 'notes', e.target.value)}
+                                placeholder="Catatan opsional"
+                                className="w-32"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={isComplete ? "default" : "secondary"}>
+                                {isComplete ? "Selesai" : "Belum"}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Save Button */}
             <div className="flex justify-between items-center pt-4 border-t">
               <div className="text-sm text-muted-foreground">
-                Total: {data.length} data stok pangan
+                {getCompletedCount() > 0 && `${getCompletedCount()} komoditas siap disimpan`}
               </div>
               <Button 
                 onClick={handleSave} 
-                disabled={isLoading || data.length === 0}
+                disabled={isLoading || getCompletedCount() === 0 || !user}
                 className="ml-auto"
               >
                 <Save className="w-4 h-4 mr-2" />
-                {isLoading ? "Menyimpan..." : "Simpan Data"}
+                {isLoading ? "Menyimpan..." : `Simpan Data (${getCompletedCount()} items)`}
               </Button>
             </div>
-          </div>
+          </>
         )}
 
-        {data.length === 0 && (
+        {!selectedStore && (
           <div className="text-center py-8 text-muted-foreground">
-            <Plus className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p>Klik "Tambah Data Stok" untuk mulai menginput data</p>
+            <Store className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>Pilih toko besar terlebih dahulu untuk mulai input stok pangan</p>
           </div>
         )}
       </CardContent>
