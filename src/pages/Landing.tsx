@@ -35,29 +35,31 @@ const Landing = () => {
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10">
       {/* Header with Login Button */}
       <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-primary-foreground" />
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-4 h-4 sm:w-6 sm:h-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-primary">SIMDAG</h1>
-                <p className="text-sm text-muted-foreground">Sistem Informasi Perdagangan</p>
+                <h1 className="text-lg sm:text-xl font-bold text-primary">SIMDAG</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Sistem Informasi Perdagangan</p>
               </div>
             </div>
             
-            <div className="flex gap-3">
-              <Button asChild variant="warning" size="lg">
+            <div className="flex gap-2 sm:gap-3">
+              <Button asChild variant="warning" size="sm" className="text-xs sm:text-sm">
                 <Link to="/login">
-                  <AlertTriangle className="w-4 h-4" />
-                  Login Admin
+                  <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Login Admin</span>
+                  <span className="sm:hidden">Admin</span>
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link to="/login">
-                  <Eye className="w-4 h-4" />
-                  Monitor Pasar
+              <Button asChild variant="outline" size="sm" className="text-xs sm:text-sm">
+                <Link to="/training">
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Training</span>
+                  <span className="sm:hidden">Info</span>
                 </Link>
               </Button>
             </div>
@@ -66,27 +68,27 @@ const Landing = () => {
       </header>
 
       {/* Hero Section with Slider */}
-      <section className="py-12">
-        <div className="container mx-auto px-6">
-          <div className="text-center space-y-6 mb-12">
-            <h1 className="text-6xl font-bold bg-gradient-to-r from-primary via-accent to-warning bg-clip-text text-transparent">
+      <section className="py-6 sm:py-8 lg:py-12">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center space-y-4 sm:space-y-6 mb-8 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-primary via-accent to-warning bg-clip-text text-transparent">
               SIMDAG Salatiga
             </h1>
-            <h2 className="text-4xl font-semibold text-foreground">
+            <h2 className="text-xl sm:text-2xl lg:text-4xl font-semibold text-foreground">
               Sistem Monitoring Bapokmas Pasar
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Platform digital terintegrasi untuk monitoring harga dan ketersediaan komoditas 
               di seluruh pasar tradisional Kota Salatiga oleh Badan Pangan, Kelautan, dan Perikanan (Bapokmas)
             </p>
-            <div className="flex justify-center gap-4 pt-4">
-              <div className="bg-primary/10 text-primary px-4 py-2 rounded-full font-semibold">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-4 pt-4">
+              <div className="bg-primary/10 text-primary px-3 py-1 sm:px-4 sm:py-2 rounded-full font-semibold text-xs sm:text-sm">
                 🏛️ {totalMarkets} Pasar Tradisional
               </div>
-              <div className="bg-warning/10 text-warning px-4 py-2 rounded-full font-semibold">
+              <div className="bg-warning/10 text-warning px-3 py-1 sm:px-4 sm:py-2 rounded-full font-semibold text-xs sm:text-sm">
                 📊 Real-time Monitoring
               </div>
-              <div className="bg-success/10 text-success px-4 py-2 rounded-full font-semibold">
+              <div className="bg-success/10 text-success px-3 py-1 sm:px-4 sm:py-2 rounded-full font-semibold text-xs sm:text-sm">
                 🎯 {Object.keys(marketsByKecamatan).length} Kecamatan
               </div>
             </div>
@@ -111,18 +113,18 @@ const Landing = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-background/50">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h3 className="text-4xl font-bold text-foreground mb-6">
+      <section className="py-8 sm:py-12 lg:py-16 bg-background/50">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8 sm:mb-12">
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-4 sm:mb-6">
               Fitur Monitoring Bapokmas
             </h3>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base lg:text-xl text-muted-foreground max-w-2xl mx-auto">
               Sistem komprehensif untuk pengawasan harga komoditas dan stabilitas pasar di Salatiga
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
             <Card className="group border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 bg-gradient-to-br from-card to-primary/5">
               <CardHeader className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">

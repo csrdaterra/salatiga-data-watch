@@ -40,24 +40,24 @@ const recentActivities = [
 
 const AdminDashboard = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Page Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">Dashboard Admin</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">Dashboard Admin</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Selamat datang di SIMDAG - Sistem Informasi Perdagangan Salatiga
         </p>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {summaryData.map((item, index) => (
           <Card key={index} className="border-2 hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">{item.title}</p>
-                  <p className="text-3xl font-bold text-foreground">{item.value}</p>
+                <div className="space-y-1 sm:space-y-2">
+                  <p className="text-xs sm:text-sm text-muted-foreground">{item.title}</p>
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground">{item.value}</p>
                   <p className={`text-sm ${
                     item.color === 'green' ? 'text-green-600' : 
                     item.color === 'blue' ? 'text-blue-600' :
@@ -66,12 +66,12 @@ const AdminDashboard = () => {
                     {item.change}
                   </p>
                 </div>
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center ${
                   item.color === 'green' ? 'bg-green-100' : 
                   item.color === 'blue' ? 'bg-blue-100' :
                   item.color === 'orange' ? 'bg-orange-100' : 'bg-purple-100'
                 }`}>
-                  <item.icon className={`w-6 h-6 ${
+                  <item.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${
                     item.color === 'green' ? 'text-green-600' : 
                     item.color === 'blue' ? 'text-blue-600' :
                     item.color === 'orange' ? 'text-orange-600' : 'text-purple-600'
@@ -83,7 +83,7 @@ const AdminDashboard = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Price Trend Chart */}
         <Card className="border-2">
           <CardHeader>
@@ -96,7 +96,7 @@ const AdminDashboard = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-64">
+            <div className="h-48 sm:h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={recentPriceData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -136,7 +136,7 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="space-y-4">
               {recentActivities.map((activity, index) => (
-                <div key={index} className="flex items-start space-x-3 p-3 rounded-lg bg-muted/30">
+                <div key={index} className="flex items-start space-x-2 sm:space-x-3 p-2 sm:p-3 rounded-lg bg-muted/30">
                   <div className="flex-shrink-0 mt-0.5">
                     {activity.status === "success" && (
                       <CheckCircle className="w-4 h-4 text-green-600" />
@@ -174,36 +174,36 @@ const AdminDashboard = () => {
       </div>
 
       {/* Quick Access Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer">
-          <CardContent className="p-4 text-center">
-            <Store className="w-8 h-8 text-primary mx-auto mb-2" />
-            <h3 className="font-semibold text-foreground">Kelola Pasar</h3>
-            <p className="text-sm text-muted-foreground">Tambah atau edit data pasar</p>
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Store className="w-6 h-6 sm:w-8 sm:h-8 text-primary mx-auto mb-2" />
+            <h3 className="font-semibold text-foreground text-sm sm:text-base">Kelola Pasar</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Tambah atau edit data pasar</p>
           </CardContent>
         </Card>
 
         <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer">
-          <CardContent className="p-4 text-center">
-            <Building2 className="w-8 h-8 text-primary mx-auto mb-2" />
-            <h3 className="font-semibold text-foreground">Toko Besar</h3>
-            <p className="text-sm text-muted-foreground">Manajemen data retailer</p>
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Building2 className="w-6 h-6 sm:w-8 sm:h-8 text-primary mx-auto mb-2" />
+            <h3 className="font-semibold text-foreground text-sm sm:text-base">Toko Besar</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Manajemen data retailer</p>
           </CardContent>
         </Card>
 
         <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer">
-          <CardContent className="p-4 text-center">
-            <Fuel className="w-8 h-8 text-primary mx-auto mb-2" />
-            <h3 className="font-semibold text-foreground">SPBU</h3>
-            <p className="text-sm text-muted-foreground">Data stasiun BBM</p>
+          <CardContent className="p-3 sm:p-4 text-center">
+            <Fuel className="w-6 h-6 sm:w-8 sm:h-8 text-primary mx-auto mb-2" />
+            <h3 className="font-semibold text-foreground text-sm sm:text-base">SPBU</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Data stasiun BBM</p>
           </CardContent>
         </Card>
 
         <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer">
-          <CardContent className="p-4 text-center">
-            <BarChart3 className="w-8 h-8 text-primary mx-auto mb-2" />
-            <h3 className="font-semibold text-foreground">Laporan</h3>
-            <p className="text-sm text-muted-foreground">Generate laporan</p>
+          <CardContent className="p-3 sm:p-4 text-center">
+            <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-primary mx-auto mb-2" />
+            <h3 className="font-semibold text-foreground text-sm sm:text-base">Laporan</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block">Generate laporan</p>
           </CardContent>
         </Card>
       </div>

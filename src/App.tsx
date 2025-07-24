@@ -17,6 +17,7 @@ import GasStations from "./pages/admin/GasStations";
 import Reports from "./pages/admin/Reports";
 import PriceMonitoring from "./pages/admin/PriceMonitoring";
 import LPGSubsidized from "./pages/admin/LPGSubsidized";
+import Training from "./pages/Training";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/simdag" element={<Simdag />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/operator" element={<Operator />} />
+          <Route path="/training" element={<Training />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="markets" element={<Markets />} />
