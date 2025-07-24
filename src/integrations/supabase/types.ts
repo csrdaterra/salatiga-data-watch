@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      markets: {
+        Row: {
+          address: string
+          city: string
+          contact: string | null
+          created_at: string
+          id: number
+          is_active: boolean | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          city?: string
+          contact?: string | null
+          created_at?: string
+          id?: number
+          is_active?: boolean | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          contact?: string | null
+          created_at?: string
+          id?: number
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       price_surveys: {
         Row: {
           commodity_id: number

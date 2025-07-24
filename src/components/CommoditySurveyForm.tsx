@@ -94,13 +94,36 @@ const CommoditySurveyForm = () => {
   const [commodityInputs, setCommodityInputs] = useState<CommodityPriceInput[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [lastSurveyDate, setLastSurveyDate] = useState<string>("");
+  const [markets, setMarkets] = useState<Array<{id: number, name: string, address: string, contact: string}>>([]);
+  const [isLoadingMarkets, setIsLoadingMarkets] = useState(true);
 
-  // Daftar pasar static (simplified untuk kepokmas)
-  const markets = [
-    { id: 1, name: "Pasar Beringharjo", address: "Jl. Malioboro, Yogyakarta", contact: "0274-123456" },
-    { id: 2, name: "Pasar Klewer", address: "Jl. Secang, Solo", contact: "0271-234567" },
-    { id: 3, name: "Pasar Gede", address: "Jl. Urip Sumoharjo, Solo", contact: "0271-345678" },
-  ];
+  // Fetch markets from database
+  useEffect(() => {
+    const fetchMarkets = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('markets')
+          .select('id, name, address, contact')
+          .eq('city', 'Salatiga')
+          .eq('is_active', true)
+          .order('name');
+
+        if (error) throw error;
+        setMarkets(data || []);
+      } catch (error: any) {
+        console.error('Error fetching markets:', error);
+        toast({
+          title: "Error",
+          description: "Gagal memuat data pasar",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingMarkets(false);
+      }
+    };
+
+    fetchMarkets();
+  }, []);
 
   // Initialize commodity inputs when component mounts
   useEffect(() => {
@@ -253,9 +276,9 @@ const CommoditySurveyForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="market">Pasar *</Label>
-              <Select value={selectedMarket} onValueChange={setSelectedMarket}>
+              <Select value={selectedMarket} onValueChange={setSelectedMarket} disabled={isLoadingMarkets}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih pasar untuk survey" />
+                  <SelectValue placeholder={isLoadingMarkets ? "Memuat pasar..." : "Pilih pasar untuk survey"} />
                 </SelectTrigger>
                 <SelectContent>
                   {markets.map((market) => (
