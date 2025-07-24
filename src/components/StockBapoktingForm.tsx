@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { getCommodities } from "@/stores/commodityStore";
+import { getLargeStores } from "@/stores/largeStoreStore";
 import { Upload, Download, Plus, Trash2, FileDown } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { downloadSampleStockBapoktingFile } from "@/utils/sampleFileGenerator";
@@ -37,11 +38,13 @@ const StockBapoktingForm = () => {
   const [operatorName, setOperatorName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [commodities, setCommodities] = useState<any[]>([]);
+  const [largeStores, setLargeStores] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   React.useEffect(() => {
     loadCommodities();
+    loadLargeStores();
   }, []);
 
   const loadCommodities = async () => {
@@ -50,6 +53,15 @@ const StockBapoktingForm = () => {
       setCommodities(commoditiesData);
     } catch (error) {
       console.error('Error loading commodities:', error);
+    }
+  };
+
+  const loadLargeStores = () => {
+    try {
+      const storesData = getLargeStores();
+      setLargeStores(storesData);
+    } catch (error) {
+      console.error('Error loading large stores:', error);
     }
   };
 
@@ -381,12 +393,21 @@ const StockBapoktingForm = () => {
                         </Select>
                       </TableCell>
                       <TableCell>
-                        <Input
+                        <Select
                           value={row.store_name}
-                          onChange={(e) => updateRow(index, 'store_name', e.target.value)}
-                          placeholder="Nama toko"
-                          className="w-40"
-                        />
+                          onValueChange={(value) => updateRow(index, 'store_name', value)}
+                        >
+                          <SelectTrigger className="w-40">
+                            <SelectValue placeholder="Pilih toko" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {largeStores.map((store) => (
+                              <SelectItem key={store.id} value={store.storeName}>
+                                {store.storeName}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </TableCell>
                       <TableCell>
                         <Input
