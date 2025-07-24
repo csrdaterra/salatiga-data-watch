@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, BarChart3, Monitor, TrendingUp } from "lucide-react";
+import { Settings, BarChart3, Monitor, TrendingUp, UserCheck } from "lucide-react";
 import { CommodityTrendAnalytics } from "@/components/CommodityTrendAnalytics";
 
 const Index = () => {
@@ -38,12 +38,19 @@ const Index = () => {
 
           <TabsContent value="overview" className="space-y-6">
             <div className="flex items-center justify-center">
-              <div className="text-center space-y-6 max-w-2xl">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
+              <div className="text-center space-y-6 max-w-4xl">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
                   <Button asChild className="bg-blue-600 hover:bg-blue-700 h-16">
                     <Link to="/simdag" className="flex flex-col items-center space-y-2">
                       <Monitor className="w-6 h-6" />
                       <span>Dashboard SIMDAG</span>
+                    </Link>
+                  </Button>
+                  
+                  <Button asChild className="bg-green-600 hover:bg-green-700 h-16">
+                    <Link to="/operator" className="flex flex-col items-center space-y-2">
+                      <UserCheck className="w-6 h-6" />
+                      <span>Portal Operator</span>
                     </Link>
                   </Button>
                   
