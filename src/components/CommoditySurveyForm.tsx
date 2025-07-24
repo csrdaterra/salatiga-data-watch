@@ -187,19 +187,7 @@ const CommoditySurveyForm = () => {
     setIsSubmitting(true);
 
     try {
-      // Get current user for authentication check
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Error Autentikasi",
-          description: "Anda harus login terlebih dahulu untuk menyimpan data",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Prepare data for storage (without user_id since it's not in the schema)
+      // Prepare data for storage (without authentication requirement)
       const surveyData = completedInputs.map(input => ({
         market_id: parseInt(selectedMarket),
         commodity_id: input.commodityId,
@@ -208,10 +196,10 @@ const CommoditySurveyForm = () => {
         quality: input.quality as 'excellent' | 'good' | 'average' | 'poor',
         notes: input.notes || null,
         survey_date: lastSurveyDate,
-        operator_name: "Operator Aktif"
+        operator_name: "Operator Kepokmas"
       }));
 
-      // Save to Supabase
+      // Save to Supabase (without auth check)
       const { error } = await supabase
         .from('price_surveys')
         .insert(surveyData);
