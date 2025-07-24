@@ -11,7 +11,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { PlusCircle, Save, FileText, TrendingUp, Calendar, MapPin, DollarSign } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { getCommodities } from "@/stores/commodityStore";
+import { getCommodities, getMarketCommodities, getMarketCommoditiesByMarket } from "@/stores/commodityStore";
 import { getMarkets } from "@/stores/marketStore";
 
 interface PriceSurvey {
@@ -79,7 +79,7 @@ const generateSampleSurveys = (): PriceSurvey[] => {
   return data;
 };
 
-export const OperatorPage = () => {
+function OperatorPage() {
   const { toast } = useToast();
   const [surveys, setSurveys] = useState<PriceSurvey[]>(generateSampleSurveys());
   const [selectedMarket, setSelectedMarket] = useState<string>("");
@@ -91,8 +91,24 @@ export const OperatorPage = () => {
   const [reportPeriod, setReportPeriod] = useState<string>("daily");
   const [reportMarket, setReportMarket] = useState<string>("all");
 
-  const commodities = getCommodities();
+  const allCommodities = getCommodities();
   const markets = getMarkets();
+
+  // Filter commodities based on selected market
+  const availableCommodities = selectedMarket 
+    ? (() => {
+        const marketCommodities = getMarketCommoditiesByMarket(parseInt(selectedMarket));
+        return allCommodities.filter(commodity => 
+          marketCommodities.some(mc => mc.commodityId === commodity.id && mc.availability)
+        );
+      })()
+    : [];
+
+  // Reset commodity selection when market changes
+  const handleMarketChange = (marketId: string) => {
+    setSelectedMarket(marketId);
+    setSelectedCommodity(""); // Reset commodity selection
+  };
 
   const handleSubmitSurvey = () => {
     if (!selectedMarket || !selectedCommodity || !price || !stock || !quality) {
@@ -116,19 +132,24 @@ export const OperatorPage = () => {
       notes: notes || undefined
     };
 
-    setSurveys([newSurvey, ...surveys]);
+    // Add new survey and update state
+    const updatedSurveys = [newSurvey, ...surveys];
+    setSurveys(updatedSurveys);
     
-    // Reset form
-    setSelectedMarket("");
+    // Reset form but keep market selection
     setSelectedCommodity("");
     setPrice("");
     setStock("");
     setQuality("");
     setNotes("");
 
+    // Show success message with real-time update info
+    const commodity = allCommodities.find(c => c.id === parseInt(selectedCommodity));
+    const market = markets.find(m => m.id === parseInt(selectedMarket));
+    
     toast({
-      title: "Berhasil",
-      description: "Data survey harga berhasil disimpan",
+      title: "Survey Berhasil Disimpan",
+      description: `Data harga ${commodity?.name} di ${market?.name} telah diperbarui secara real-time`,
     });
   };
 
@@ -170,7 +191,7 @@ export const OperatorPage = () => {
       });
 
       const commodityData = Object.entries(commodityPrices).map(([commodityId, prices]) => {
-        const commodity = commodities.find(c => c.id === parseInt(commodityId));
+        const commodity = allCommodities.find(c => c.id === parseInt(commodityId));
         const avgPrice = Math.round(prices.reduce((sum, price) => sum + price, 0) / prices.length);
         
         return {
@@ -242,8 +263,8 @@ export const OperatorPage = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="market">Pasar</Label>
-                  <Select value={selectedMarket} onValueChange={setSelectedMarket}>
+                  <Label htmlFor="market">Pasar *</Label>
+                  <Select value={selectedMarket} onValueChange={handleMarketChange}>
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih pasar" />
                     </SelectTrigger>
@@ -258,17 +279,20 @@ export const OperatorPage = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="commodity">Komoditas</Label>
-                  <Select value={selectedCommodity} onValueChange={setSelectedCommodity}>
+                  <Label htmlFor="commodity">Komoditas * {selectedMarket && `(${availableCommodities.length} tersedia)`}</Label>
+                  <Select value={selectedCommodity} onValueChange={setSelectedCommodity} disabled={!selectedMarket}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Pilih komoditas" />
+                      <SelectValue placeholder={selectedMarket ? "Pilih komoditas yang tersedia" : "Pilih pasar terlebih dahulu"} />
                     </SelectTrigger>
                     <SelectContent>
-                      {commodities.map((commodity) => (
+                      {availableCommodities.map((commodity) => (
                         <SelectItem key={commodity.id} value={commodity.id.toString()}>
                           {commodity.name} ({commodity.unit})
                         </SelectItem>
                       ))}
+                      {selectedMarket && availableCommodities.length === 0 && (
+                        <SelectItem value="" disabled>Tidak ada komoditas tersedia</SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
@@ -353,7 +377,7 @@ export const OperatorPage = () => {
                   <TableBody>
                     {surveys.slice(0, 10).map((survey) => {
                       const market = markets.find(m => m.id === survey.marketId);
-                      const commodity = commodities.find(c => c.id === survey.commodityId);
+                      const commodity = allCommodities.find(c => c.id === survey.commodityId);
                       return (
                         <TableRow key={survey.id}>
                           <TableCell>{new Date(survey.date).toLocaleDateString('id-ID')}</TableCell>
@@ -529,6 +553,6 @@ export const OperatorPage = () => {
       </Tabs>
     </div>
   );
-};
+}
 
 export default OperatorPage;

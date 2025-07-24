@@ -182,7 +182,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Statistics Section - Dynamic Data */}
+      {/* Statistics Section - Market-based Data */}
       <section className="py-16">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
@@ -191,7 +191,7 @@ const Landing = () => {
             </h3>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               {totalMarkets > 0 ? (
-                `Monitoring komprehensif di ${Object.keys(marketsByKecamatan).length} kecamatan dengan ${totalMarkets} pasar tradisional yang telah terdaftar untuk menjaga stabilitas pangan`
+                `Monitoring komprehensif di ${totalMarkets} pasar tradisional untuk menjaga stabilitas pangan dan harga komoditas`
               ) : (
                 `Belum ada pasar yang terdaftar. Silakan tambahkan data pasar melalui panel admin.`
               )}
@@ -199,20 +199,34 @@ const Landing = () => {
           </div>
 
           {totalMarkets > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {kecamatanData.map((area, index) => (
-                <Card key={index} className={`text-center border-2 hover:border-${area.highlight}/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-gradient-to-br from-card to-${area.highlight}/5`}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {markets.map((market, index) => (
+                <Card key={market.id} className="group cursor-pointer text-center border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-gradient-to-br from-card to-primary/5">
                   <CardHeader>
-                    <div className={`w-12 h-12 bg-${area.highlight}/10 rounded-lg flex items-center justify-center mx-auto mb-3`}>
-                      <MapPin className={`w-6 h-6 text-${area.highlight}`} />
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
+                      <MapPin className="w-6 h-6 text-primary" />
                     </div>
-                    <CardTitle className={`text-xl text-${area.highlight}`}>{area.area}</CardTitle>
+                    <CardTitle className="text-xl text-primary">{market.name}</CardTitle>
+                    <p className="text-sm text-muted-foreground">{market.address}</p>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <p className="font-semibold text-foreground text-lg">{area.markets}</p>
-                    <p className="text-muted-foreground font-medium">{area.traders}</p>
-                    <div className={`inline-block px-3 py-1 bg-${area.highlight}/10 text-${area.highlight} rounded-full text-sm font-medium`}>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="bg-blue-50 p-3 rounded-lg">
+                        <p className="font-semibold text-blue-700">50+</p>
+                        <p className="text-blue-600">Komoditas</p>
+                      </div>
+                      <div className="bg-green-50 p-3 rounded-lg">
+                        <p className="font-semibold text-green-700">Real-time</p>
+                        <p className="text-green-600">Update</p>
+                      </div>
+                    </div>
+                    <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium group-hover:bg-primary group-hover:text-white transition-colors">
                       Monitoring Aktif
+                    </div>
+                    <div className="pt-2">
+                      <p className="text-xs text-muted-foreground">
+                        Klik untuk melihat data komoditas real-time
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
