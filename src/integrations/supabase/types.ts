@@ -83,6 +83,75 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_bapokting: {
+        Row: {
+          april: number | null
+          august: number | null
+          commodity_id: number
+          created_at: string
+          december: number | null
+          february: number | null
+          id: string
+          january_capaian: number | null
+          july: number | null
+          june: number | null
+          march: number | null
+          may: number | null
+          november: number | null
+          october: number | null
+          operator_name: string
+          september: number | null
+          store_name: string
+          survey_date: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          april?: number | null
+          august?: number | null
+          commodity_id: number
+          created_at?: string
+          december?: number | null
+          february?: number | null
+          id?: string
+          january_capaian?: number | null
+          july?: number | null
+          june?: number | null
+          march?: number | null
+          may?: number | null
+          november?: number | null
+          october?: number | null
+          operator_name: string
+          september?: number | null
+          store_name: string
+          survey_date: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          april?: number | null
+          august?: number | null
+          commodity_id?: number
+          created_at?: string
+          december?: number | null
+          february?: number | null
+          id?: string
+          january_capaian?: number | null
+          july?: number | null
+          june?: number | null
+          march?: number | null
+          may?: number | null
+          november?: number | null
+          october?: number | null
+          operator_name?: string
+          september?: number | null
+          store_name?: string
+          survey_date?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           assigned_at: string

@@ -1,15 +1,16 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle, FileText, BarChart3 } from "lucide-react";
+import { PlusCircle, FileText, BarChart3, Package } from "lucide-react";
 import CommoditySurveyForm from "@/components/CommoditySurveyForm";
 import SurveyResultsTable from "@/components/SurveyResultsTable";
 import SurveyAnalytics from "@/components/SurveyAnalytics";
+import StockBapoktingForm from "@/components/StockBapoktingForm";
 
 function OperatorPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <Tabs defaultValue="survey" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="survey" className="flex items-center space-x-2">
             <PlusCircle className="w-4 h-4" />
             <span>Input Survey Harga</span>
@@ -21,6 +22,10 @@ function OperatorPage() {
           <TabsTrigger value="analytics" className="flex items-center space-x-2">
             <BarChart3 className="w-4 h-4" />
             <span>Analisa & Statistik</span>
+          </TabsTrigger>
+          <TabsTrigger value="stock-bapokting" className="flex items-center space-x-2">
+            <Package className="w-4 h-4" />
+            <span>Data Stok Bapokting</span>
           </TabsTrigger>
         </TabsList>
 
@@ -34,6 +39,10 @@ function OperatorPage() {
 
         <TabsContent value="analytics">
           <SurveyAnalytics />
+        </TabsContent>
+
+        <TabsContent value="stock-bapokting">
+          <StockBapoktingForm />
         </TabsContent>
       </Tabs>
     </div>
