@@ -9,54 +9,59 @@ import { useToast } from "@/components/ui/use-toast";
 import { PriceMonitoring as PriceMonitoringComponent } from "@/components/PriceMonitoring";
 import * as XLSX from "xlsx";
 
-// Data stok bapokting mock
-const generateStockData = (month: number, year: number) => {
+// Data stok bapokting sesuai format referensi
+const generateDetailedStockData = (year: number) => {
   const commodities = [
-    "Garam Halus (kg)",
-    "Garam Bata (kg)", 
-    "Telur (kg)",
-    "Gula Pasir Lokal (kg)",
-    "Gula Pasir Premium (kg)",
-    "Beras Medium (kg)",
-    "Beras Premium (kg)",
-    "Minyak Goreng Curah (Ltr)",
-    "Minyak Goreng Kemasan (Ltr)",
-    "Daging Sapi Has Dalam (kg)",
-    "Daging Sapi Kualitas 2 (kg)",
-    "Daging Ayam Ras (kg)",
-    "Ikan Bandeng (kg)",
-    "Ikan Tongkol (kg)",
-    "Ikan Cakalang (kg)",
-    "Cabai Merah Keriting (kg)",
-    "Cabai Rawit Merah (kg)",
-    "Bawang Merah (kg)",
-    "Bawang Putih (kg)",
-    "Kacang Tanah (kg)",
-    "Kedelai Lokal (kg)",
-    "Kedelai Impor (kg)",
-    "Jagung Pipilan Kering (kg)",
-    "Tepung Terigu Curah (kg)",
-    "Tepung Terigu Kemasan (kg)"
+    { id: 1, name: "Beras (kg)" },
+    { id: 2, name: "Kedelai (kg)" },
+    { id: 3, name: "Tepung Terigu (kg)" },
+    { id: 4, name: "Gula Pasir (kg)" },
+    { id: 5, name: "Minyak Goreng Curah (l)" },
+    { id: 6, name: "Minyak Goreng Kemasan (l)" },
+    { id: 7, name: "Telur (kg)" },
+    { id: 8, name: "Garam Bata (kg)" }
   ];
 
-  const locations = [
-    "Pasar Sentral Gorontalo",
-    "Pasar Sentral Limboto", 
-    "Pasar Sentral Marisa",
-    "Pasar Sentral Kwandang",
-    "Pasar Sentral Bone Bolango",
-    "Pasar Sentral Tilamuta"
+  const stores = [
+    "Obor",
+    "Dadi Agung", 
+    "Sumber Manis",
+    "PO. Tani Jaya",
+    "UD. Margo Rukun",
+    "CV. Sinar Inti Pandawa",
+    "Sumber Makmur",
+    "CV. Waringin Sukses Sejahtera"
   ];
 
-  return commodities.map((commodity, index) => ({
-    id: index + 1,
-    commodity,
-    location: locations[Math.floor(Math.random() * locations.length)],
-    stock: Math.floor(Math.random() * 1000) + 100,
-    unit: "kg",
-    lastUpdate: `${year}-${month.toString().padStart(2, '0')}-${Math.floor(Math.random() * 28) + 1}`,
-    status: Math.random() > 0.2 ? "Tersedia" : "Terbatas"
-  }));
+  const months = [
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+  ];
+
+  const data = [];
+  
+  commodities.forEach((commodity) => {
+    stores.forEach((store, storeIndex) => {
+      const row = {
+        id: `${commodity.id}-${storeIndex}`,
+        commodityId: commodity.id,
+        commodity: commodity.name,
+        store: store,
+        monthlyData: {}
+      };
+      
+      months.forEach((month) => {
+        // Generate realistic stock data with some variations
+        const baseStock = Math.floor(Math.random() * 5000) + 100;
+        const variation = Math.random() > 0.1 ? baseStock : 0; // 10% chance of no stock
+        row.monthlyData[month] = variation;
+      });
+      
+      data.push(row);
+    });
+  });
+
+  return data;
 };
 
 export default function PriceMonitoring() {
@@ -64,7 +69,7 @@ export default function PriceMonitoring() {
   const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear() + "");
   const { toast } = useToast();
 
-  const stockData = generateStockData(parseInt(selectedMonth), parseInt(selectedYear));
+  const stockData = generateDetailedStockData(parseInt(selectedYear));
 
   const months = [
     { value: "1", label: "Januari" },
@@ -87,18 +92,28 @@ export default function PriceMonitoring() {
   });
 
   const handleExportData = () => {
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(stockData.map(item => ({
-      'Komoditas': item.commodity,
-      'Lokasi': item.location,
-      'Stok': item.stock,
-      'Satuan': item.unit,
-      'Terakhir Update': item.lastUpdate,
-      'Status': item.status
-    })));
+    const exportData = [];
     
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Stok Bapokting');
-    XLSX.writeFile(workbook, `Data_Stok_Bapokting_${selectedMonth}_${selectedYear}.xlsx`);
+    stockData.forEach((row) => {
+      const rowData = {
+        'No': row.commodityId,
+        'Komoditas': row.commodity,
+        'Nama Toko Besar': row.store
+      };
+      
+      // Add monthly data
+      Object.keys(row.monthlyData).forEach((month) => {
+        rowData[month] = row.monthlyData[month];
+      });
+      
+      exportData.push(rowData);
+    });
+    
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    
+    XLSX.utils.book_append_sheet(workbook, worksheet, `Data Stok ${selectedYear}`);
+    XLSX.writeFile(workbook, `Data_Stok_Bapokting_${selectedYear}.xlsx`);
     
     toast({
       title: "Export Berhasil",
@@ -135,7 +150,7 @@ export default function PriceMonitoring() {
                 <div>
                   <CardTitle className="flex items-center">
                     <FileText className="w-5 h-5 mr-2" />
-                    Data Stok Bapokting
+                    Data Stok Bapokting - Tingkat Toko Besar/Distributor Tahun {selectedYear}
                   </CardTitle>
                 </div>
                 <Button onClick={handleExportData} className="flex items-center space-x-2">
@@ -149,20 +164,8 @@ export default function PriceMonitoring() {
               <div className="flex flex-col md:flex-row gap-4 mb-6 p-4 border rounded-lg bg-muted/50">
                 <div className="flex items-center space-x-2">
                   <CalendarIcon className="w-4 h-4" />
-                  <span className="text-sm font-medium">Filter Waktu:</span>
+                  <span className="text-sm font-medium">Filter Tahun:</span>
                 </div>
-                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Pilih Bulan" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((month) => (
-                      <SelectItem key={month.value} value={month.value}>
-                        {month.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
                 <Select value={selectedYear} onValueChange={setSelectedYear}>
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="Pilih Tahun" />
@@ -178,37 +181,45 @@ export default function PriceMonitoring() {
               </div>
 
               {/* Data Table */}
-              <div className="rounded-md border">
+              <div className="rounded-md border overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>No</TableHead>
-                      <TableHead>Komoditas</TableHead>
-                      <TableHead>Lokasi</TableHead>
-                      <TableHead>Stok</TableHead>
-                      <TableHead>Satuan</TableHead>
-                      <TableHead>Terakhir Update</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead className="w-12">No</TableHead>
+                      <TableHead className="w-40">Komoditas</TableHead>
+                      <TableHead className="w-48">Nama Toko Besar</TableHead>
+                      <TableHead className="text-center">Jan</TableHead>
+                      <TableHead className="text-center">Feb</TableHead>
+                      <TableHead className="text-center">Mar</TableHead>
+                      <TableHead className="text-center">Apr</TableHead>
+                      <TableHead className="text-center">Mei</TableHead>
+                      <TableHead className="text-center">Jun</TableHead>
+                      <TableHead className="text-center">Jul</TableHead>
+                      <TableHead className="text-center">Agt</TableHead>
+                      <TableHead className="text-center">Sep</TableHead>
+                      <TableHead className="text-center">Okt</TableHead>
+                      <TableHead className="text-center">Nov</TableHead>
+                      <TableHead className="text-center">Des</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {stockData.map((item, index) => (
                       <TableRow key={item.id}>
-                        <TableCell>{index + 1}</TableCell>
+                        <TableCell className="text-center">{item.commodityId}</TableCell>
                         <TableCell className="font-medium">{item.commodity}</TableCell>
-                        <TableCell>{item.location}</TableCell>
-                        <TableCell>{item.stock.toLocaleString()}</TableCell>
-                        <TableCell>{item.unit}</TableCell>
-                        <TableCell>{item.lastUpdate}</TableCell>
-                        <TableCell>
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            item.status === 'Tersedia' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {item.status}
-                          </span>
-                        </TableCell>
+                        <TableCell>{item.store}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['Januari']?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['Februari']?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['Maret']?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['April']?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['Mei']?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['Juni']?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['Juli']?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['Agustus']?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['September']?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['Oktober']?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['November']?.toLocaleString() || '0'}</TableCell>
+                        <TableCell className="text-center">{item.monthlyData['Desember']?.toLocaleString() || '0'}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -216,12 +227,22 @@ export default function PriceMonitoring() {
               </div>
 
               {/* Summary */}
-              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                   <CardContent className="p-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-primary">{stockData.length}</div>
-                      <div className="text-sm text-muted-foreground">Total Komoditas</div>
+                      <div className="text-sm text-muted-foreground">Total Entri Data</div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {Array.from(new Set(stockData.map(item => item.commodity))).length}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Jenis Komoditas</div>
                     </div>
                   </CardContent>
                 </Card>
@@ -229,19 +250,19 @@ export default function PriceMonitoring() {
                   <CardContent className="p-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {stockData.filter(item => item.status === 'Tersedia').length}
+                        {Array.from(new Set(stockData.map(item => item.store))).length}
                       </div>
-                      <div className="text-sm text-muted-foreground">Stok Tersedia</div>
+                      <div className="text-sm text-muted-foreground">Toko/Distributor</div>
                     </div>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-yellow-600">
-                        {stockData.filter(item => item.status === 'Terbatas').length}
+                      <div className="text-2xl font-bold text-purple-600">
+                        {selectedYear}
                       </div>
-                      <div className="text-sm text-muted-foreground">Stok Terbatas</div>
+                      <div className="text-sm text-muted-foreground">Tahun Laporan</div>
                     </div>
                   </CardContent>
                 </Card>
