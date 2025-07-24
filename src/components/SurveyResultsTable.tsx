@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { getCommodities } from "@/stores/commodityStore";
 import { getMarkets } from "@/stores/marketStore";
-import { FileText, Search, Calendar, BarChart3, TrendingUp } from "lucide-react";
+import { FileText, Search, Calendar, BarChart3, TrendingUp, Download } from "lucide-react";
+import * as XLSX from 'xlsx';
 
 interface SurveyResult {
   id: string;
@@ -157,6 +159,55 @@ const SurveyResultsTable = () => {
     return market?.name || 'Unknown';
   };
 
+  // Export to Excel function
+  const exportToExcel = () => {
+    if (filteredSurveys.length === 0) {
+      alert('Tidak ada data untuk diekspor');
+      return;
+    }
+
+    // Prepare data for Excel with the requested format
+    const excelData = filteredSurveys.map(survey => ({
+      'Tanggal': new Date(survey.survey_date).toLocaleDateString('id-ID'),
+      'Pasar': getMarketName(survey.market_id),
+      'Nama Komoditas': getCommodityName(survey.commodity_id),
+      'Harga': survey.price,
+      'Status Stok': getStockLabel(survey.stock_status),
+      'Kualitas': getQualityLabel(survey.quality),
+      'Operator': survey.operator_name,
+      'Catatan': survey.notes || ''
+    }));
+
+    // Create workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(excelData);
+
+    // Set column widths for better formatting
+    const colWidths = [
+      { wch: 12 }, // Tanggal
+      { wch: 20 }, // Pasar
+      { wch: 25 }, // Nama Komoditas
+      { wch: 15 }, // Harga
+      { wch: 12 }, // Status Stok
+      { wch: 12 }, // Kualitas
+      { wch: 15 }, // Operator
+      { wch: 30 }  // Catatan
+    ];
+    ws['!cols'] = colWidths;
+
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Survey Harga');
+
+    // Generate filename with current date and period
+    const periodText = timePeriod === 'daily' ? 'Harian' : 
+                     timePeriod === 'weekly' ? 'Mingguan' : 'Tahunan';
+    const currentDate = new Date().toISOString().split('T')[0];
+    const filename = `Survey_Harga_${periodText}_${currentDate}.xlsx`;
+
+    // Save file
+    XLSX.writeFile(wb, filename);
+  };
+
   const renderSurveyTable = () => (
     <div className="space-y-4">
       {/* Filters */}
@@ -209,6 +260,14 @@ const SurveyResultsTable = () => {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* Export Button */}
+      <div className="flex justify-end">
+        <Button onClick={exportToExcel} className="flex items-center gap-2">
+          <Download className="w-4 h-4" />
+          Export ke Excel
+        </Button>
       </div>
 
       {/* Results Table */}
