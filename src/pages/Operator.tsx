@@ -1,11 +1,12 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingCart, Package, Eye, BarChart3, TrendingUp } from "lucide-react";
+import { ShoppingCart, Package, Eye, BarChart3, TrendingUp, Calendar } from "lucide-react";
 import CommoditySurveyForm from "@/components/CommoditySurveyForm";
 import StockPanganForm from "@/components/StockPanganForm";
 import KepokmasPreviewTable from "@/components/KepokmasPreviewTable";
 import StockPanganPreviewTable from "@/components/StockPanganPreviewTable";
 import KepokmasAnalytics from "@/components/KepokmasAnalytics";
+import WeeklyComparisonAnalytics from "@/components/WeeklyComparisonAnalytics";
 
 function OperatorPage() {
   return (
@@ -18,7 +19,7 @@ function OperatorPage() {
       </div>
 
       <Tabs defaultValue="kepokmas" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="kepokmas" className="flex items-center space-x-2">
             <ShoppingCart className="w-4 h-4" />
             <span>Input Kepokmas</span>
@@ -38,6 +39,10 @@ function OperatorPage() {
           <TabsTrigger value="analytics" className="flex items-center space-x-2">
             <TrendingUp className="w-4 h-4" />
             <span>Analitik Kepokmas</span>
+          </TabsTrigger>
+          <TabsTrigger value="weekly-comparison" className="flex items-center space-x-2">
+            <Calendar className="w-4 h-4" />
+            <span>Perbandingan Mingguan</span>
           </TabsTrigger>
         </TabsList>
 
@@ -59,6 +64,10 @@ function OperatorPage() {
 
         <TabsContent value="analytics">
           <KepokmasAnalytics />
+        </TabsContent>
+
+        <TabsContent value="weekly-comparison">
+          <WeeklyComparisonAnalytics />
         </TabsContent>
       </Tabs>
     </div>
