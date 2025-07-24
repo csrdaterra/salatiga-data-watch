@@ -39,23 +39,113 @@ const LargeStores = () => {
   const [stores, setStores] = useState<LargeStore[]>([
     {
       id: 1,
-      storeName: "Toko Sinar Jaya",
-      ownerName: "Budi Santoso",
-      address: "Jl. Jenderal Sudirman No. 45, Salatiga",
-      contact: "0298-321789",
-      commodityName: "Beras, Gula, Minyak Goreng",
-      longitude: "110.4901",
-      latitude: "-7.3289"
+      storeName: "CV. Sinar Inti Pandawa",
+      ownerName: "Sutrisno",
+      address: "Jalan Taman Sari, Belakang Pasar Raya II, Kel. Kutowinangun Lor, Kec. Tingkir",
+      contact: "0298-321456",
+      commodityName: "Sembako, Kebutuhan Pokok",
+      longitude: "110.4892",
+      latitude: "-7.3298"
     },
     {
       id: 2,
-      storeName: "Supermarket Mandiri",
-      ownerName: "Siti Rahayu",
-      address: "Jl. Kartini No. 23, Salatiga",
+      storeName: "Dadi Agung",
+      ownerName: "Dadi Hermawan",
+      address: "Jalan Kalinyamat No 36, Kel. Kutowinangun Kidul, Kec. Tingkir",
+      contact: "0298-322789",
+      commodityName: "Sembako, Beras, Gula",
+      longitude: "110.4887",
+      latitude: "-7.3312"
+    },
+    {
+      id: 3,
+      storeName: "Margo Rukun",
+      ownerName: "Margono",
+      address: "Jalan Canden, Kel. Kutowinangun Lor, Kec. Tingkir",
       contact: "0298-324567",
+      commodityName: "Kebutuhan Pokok, Minyak Goreng",
+      longitude: "110.4885",
+      latitude: "-7.3285"
+    },
+    {
+      id: 4,
+      storeName: "Obor",
+      ownerName: "Sutopo",
+      address: "Jalan Taman Pahlawan No 41, Kel. Kutowinangun Kidul, Kec. Tingkir",
+      contact: "0298-325890",
       commodityName: "Sembako, Kebutuhan Pokok",
-      longitude: "110.4945",
-      latitude: "-7.3301"
+      longitude: "110.4890",
+      latitude: "-7.3315"
+    },
+    {
+      id: 5,
+      storeName: "PO. Tani Jaya",
+      ownerName: "Joko Suprianto",
+      address: "Pulutan, Kel. Pulutan, Kec. Sidorejo",
+      contact: "0298-326123",
+      commodityName: "Beras, Sembako, Pupuk",
+      longitude: "110.4912",
+      latitude: "-7.3356"
+    },
+    {
+      id: 6,
+      storeName: "TB. Griya Kita Kaloka",
+      ownerName: "Bambang Kaloka",
+      address: "Jalan Patimura, Kel. Salatiga, Kec. Sidorejo",
+      contact: "0298-327456",
+      commodityName: "Bahan Bangunan, Kebutuhan Pokok",
+      longitude: "110.4925",
+      latitude: "-7.3340"
+    },
+    {
+      id: 7,
+      storeName: "TB. Jetis",
+      ownerName: "Slamet Riyadi",
+      address: "Jalan Imam Bonjol, Kel. Sidorejo Lor, Kec. Tingkir",
+      contact: "0298-328789",
+      commodityName: "Bahan Bangunan, Semen, Cat",
+      longitude: "110.4878",
+      latitude: "-7.3275"
+    },
+    {
+      id: 8,
+      storeName: "TB. Manah Asri",
+      ownerName: "Manah Sutrisno",
+      address: "Jalan Kalitaman, Kel. Kutowinangun Kidul, Kec. Tingkir",
+      contact: "0298-329012",
+      commodityName: "Bahan Bangunan, Keramik",
+      longitude: "110.4895",
+      latitude: "-7.3320"
+    },
+    {
+      id: 9,
+      storeName: "Sumber Makmur",
+      ownerName: "Sukamto",
+      address: "Jalan Kalinyamat No 31, Kel. Kutowinangun Kidul, Kec. Tingkir",
+      contact: "0298-330345",
+      commodityName: "Sembako, Kebutuhan Pokok",
+      longitude: "110.4888",
+      latitude: "-7.3310"
+    },
+    {
+      id: 10,
+      storeName: "Sumber Manis",
+      ownerName: "Manis Sari",
+      address: "Jalan Kesambi No 22, Kel. Kalicacing, Kec. Salatiga",
+      contact: "0298-331678",
+      commodityName: "Gula, Sembako, Minuman",
+      longitude: "110.4935",
+      latitude: "-7.3325"
+    },
+    {
+      id: 11,
+      storeName: "Waringin Sukses Sejati",
+      ownerName: "Waringin Setyo",
+      address: "Jalan Kesambi, Kel. Kalicacing, Kec. Salatiga",
+      contact: "0298-332901",
+      commodityName: "Sembako, Kebutuhan Pokok",
+      longitude: "110.4940",
+      latitude: "-7.3330"
     }
   ]);
   const [editingStore, setEditingStore] = useState<LargeStore | null>(null);
