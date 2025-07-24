@@ -75,11 +75,11 @@ const Landing = () => {
               SIMDAG Salatiga
             </h1>
             <h2 className="text-xl sm:text-2xl lg:text-4xl font-semibold text-foreground">
-              Sistem Monitoring Bapokmas Pasar
+              Sistem Monitoring Kepokmas Pasar
             </h2>
             <p className="text-sm sm:text-base lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Platform digital terintegrasi untuk monitoring harga dan ketersediaan komoditas 
-              di seluruh pasar tradisional Kota Salatiga oleh Badan Pangan, Kelautan, dan Perikanan (Bapokmas)
+              di seluruh pasar tradisional Kota Salatiga oleh Dinas Ketahanan Pangan (Kepokmas)
             </p>
             <div className="flex flex-wrap justify-center gap-2 sm:gap-4 pt-4">
               <div className="bg-primary/10 text-primary px-3 py-1 sm:px-4 sm:py-2 rounded-full font-semibold text-xs sm:text-sm">
@@ -117,7 +117,7 @@ const Landing = () => {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-8 sm:mb-12">
             <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-4 sm:mb-6">
-              Fitur Monitoring Bapokmas
+              Fitur Monitoring Kepokmas
             </h3>
             <p className="text-sm sm:text-base lg:text-xl text-muted-foreground max-w-2xl mx-auto">
               Sistem komprehensif untuk pengawasan harga komoditas dan stabilitas pasar di Salatiga
@@ -172,7 +172,7 @@ const Landing = () => {
                 <div className="w-16 h-16 bg-gradient-to-br from-accent to-accent/70 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                   <FileText className="w-8 h-8 text-accent-foreground" />
                 </div>
-                <CardTitle className="text-xl">Laporan Bapokmas</CardTitle>
+                <CardTitle className="text-xl">Laporan Kepokmas</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-center text-base">
@@ -189,7 +189,7 @@ const Landing = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h3 className="text-4xl font-bold text-foreground mb-6">
-              Cakupan Monitoring Bapokmas Salatiga
+              Cakupan Monitoring Kepokmas Salatiga
             </h3>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               {totalMarkets > 0 ? (
@@ -203,35 +203,38 @@ const Landing = () => {
           {totalMarkets > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {markets.map((market, index) => (
-                <Card key={market.id} className="group cursor-pointer text-center border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-gradient-to-br from-card to-primary/5">
-                  <CardHeader>
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
-                      <MapPin className="w-6 h-6 text-primary" />
-                    </div>
-                    <CardTitle className="text-xl text-primary">{market.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{market.address}</p>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="bg-blue-50 p-3 rounded-lg">
-                        <p className="font-semibold text-blue-700">50+</p>
-                        <p className="text-blue-600">Komoditas</p>
+                <Link key={market.id} to={`/market/${market.id}`}>
+                  <Card className="group cursor-pointer text-center border-2 hover:border-primary/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-gradient-to-br from-card to-primary/5 h-full">
+                    <CardHeader>
+                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/20 transition-colors">
+                        <MapPin className="w-6 h-6 text-primary" />
                       </div>
-                      <div className="bg-green-50 p-3 rounded-lg">
-                        <p className="font-semibold text-green-700">Real-time</p>
-                        <p className="text-green-600">Update</p>
+                      <CardTitle className="text-xl text-primary">{market.name}</CardTitle>
+                      <p className="text-sm text-muted-foreground">{market.address}</p>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="bg-blue-50 p-3 rounded-lg">
+                          <p className="font-semibold text-blue-700">50</p>
+                          <p className="text-blue-600">Komoditas Kepokmas</p>
+                        </div>
+                        <div className="bg-green-50 p-3 rounded-lg">
+                          <p className="font-semibold text-green-700">Real-time</p>
+                          <p className="text-green-600">Analitik</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium group-hover:bg-primary group-hover:text-white transition-colors">
-                      Monitoring Aktif
-                    </div>
-                    <div className="pt-2">
-                      <p className="text-xs text-muted-foreground">
-                        Klik untuk melihat data komoditas real-time
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium group-hover:bg-primary group-hover:text-white transition-colors">
+                        Monitoring Kepokmas Aktif
+                      </div>
+                      <div className="pt-2 flex items-center justify-center">
+                        <p className="text-xs text-muted-foreground mr-2">
+                          Lihat 50 komoditas kepokmas
+                        </p>
+                        <ArrowRight className="w-3 h-3 text-primary group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           ) : (

@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Simdag from "./pages/Simdag";
 import Settings from "./pages/Settings";
 import Operator from "./pages/Operator";
+import MarketDetail from "./pages/MarketDetail";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Markets from "./pages/admin/Markets";
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/simdag" element={<Simdag />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/operator" element={<Operator />} />
+          <Route path="/market/:marketId" element={<MarketDetail />} />
           <Route path="/training" element={<Training />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
