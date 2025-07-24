@@ -25,6 +25,7 @@ import {
   LogOut,
   BookOpen,
   Code2,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +35,7 @@ const menuItems = [
   { title: "Dashboard", url: "/admin", icon: BarChart3 },
   { title: "Training", url: "/training", icon: BookOpen },
   { title: "Dokapii", url: "/admin/dokapii", icon: Code2 },
+  { title: "Kepokmas", url: "/admin/kepokmas", icon: Package },
   { title: "Pengaturan Sistem", url: "/admin/settings", icon: Settings },
   { title: "Data Pasar", url: "/admin/markets", icon: Store },
   { title: "Toko Besar", url: "/admin/large-stores", icon: Building2 },
