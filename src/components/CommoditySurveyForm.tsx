@@ -223,7 +223,7 @@ const CommoditySurveyForm = () => {
     }
   };
 
-  const selectedMarketData = markets.find(m => m.id === parseInt(selectedMarket));
+  const selectedMarketData = selectedMarket ? markets.find(m => m.id === parseInt(selectedMarket)) : null;
 
   return (
     <div className="container mx-auto p-6 space-y-6">
