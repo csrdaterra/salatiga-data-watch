@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, Save } from "lucide-react";
+import UserRoleManagement from "@/components/UserRoleManagement";
 
 const settingsSchema = z.object({
   applicationName: z.string().min(1, "Nama aplikasi harus diisi"),
@@ -149,6 +150,11 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
+
+          <Separator />
+
+          {/* Manajemen Role Pengguna */}
+          <UserRoleManagement />
 
           <Separator />
 
