@@ -14,6 +14,203 @@ export type Database = {
   }
   public: {
     Tables: {
+      agen_lpg: {
+        Row: {
+          alamat: string
+          created_at: string
+          id: string
+          kecamatan: string
+          kelurahan: string
+          latitude: number | null
+          longitude: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          telepon: string | null
+          updated_at: string
+        }
+        Insert: {
+          alamat: string
+          created_at?: string
+          id?: string
+          kecamatan: string
+          kelurahan: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          telepon?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alamat?: string
+          created_at?: string
+          id?: string
+          kecamatan?: string
+          kelurahan?: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha?: string
+          nomor_spbu?: string
+          penanggungjawab?: string
+          telepon?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      agen_realisasi_bbm: {
+        Row: {
+          alamat: string
+          created_at: string
+          id: string
+          jenis_bbm_id: string | null
+          kecamatan: string
+          kelurahan: string
+          latitude: number | null
+          longitude: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          periode_bulan: number
+          periode_tahun: number
+          realisasi_bulanan: number | null
+          target_bulanan: number | null
+          telepon: string | null
+          updated_at: string
+        }
+        Insert: {
+          alamat: string
+          created_at?: string
+          id?: string
+          jenis_bbm_id?: string | null
+          kecamatan: string
+          kelurahan: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          periode_bulan: number
+          periode_tahun: number
+          realisasi_bulanan?: number | null
+          target_bulanan?: number | null
+          telepon?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alamat?: string
+          created_at?: string
+          id?: string
+          jenis_bbm_id?: string | null
+          kecamatan?: string
+          kelurahan?: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha?: string
+          nomor_spbu?: string
+          penanggungjawab?: string
+          periode_bulan?: number
+          periode_tahun?: number
+          realisasi_bulanan?: number | null
+          target_bulanan?: number | null
+          telepon?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agen_realisasi_bbm_jenis_bbm_id_fkey"
+            columns: ["jenis_bbm_id"]
+            isOneToOne: false
+            referencedRelation: "jenis_bbm"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agen_realisasi_gas_3kg: {
+        Row: {
+          alamat: string
+          created_at: string
+          id: string
+          kecamatan: string
+          kelurahan: string
+          latitude: number | null
+          longitude: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          periode_bulan: number
+          periode_tahun: number
+          realisasi_bulanan: number | null
+          target_bulanan: number | null
+          telepon: string | null
+          updated_at: string
+        }
+        Insert: {
+          alamat: string
+          created_at?: string
+          id?: string
+          kecamatan: string
+          kelurahan: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          periode_bulan: number
+          periode_tahun: number
+          realisasi_bulanan?: number | null
+          target_bulanan?: number | null
+          telepon?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alamat?: string
+          created_at?: string
+          id?: string
+          kecamatan?: string
+          kelurahan?: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha?: string
+          nomor_spbu?: string
+          penanggungjawab?: string
+          periode_bulan?: number
+          periode_tahun?: number
+          realisasi_bulanan?: number | null
+          target_bulanan?: number | null
+          telepon?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      jenis_bbm: {
+        Row: {
+          created_at: string
+          id: string
+          keterangan: string | null
+          nama_jenis: string
+          satuan: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          keterangan?: string | null
+          nama_jenis: string
+          satuan?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          keterangan?: string | null
+          nama_jenis?: string
+          satuan?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       markets: {
         Row: {
           address: string
@@ -43,6 +240,51 @@ export type Database = {
           id?: number
           is_active?: boolean | null
           name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pangkalan_lpg: {
+        Row: {
+          alamat: string
+          created_at: string
+          id: string
+          kecamatan: string
+          kelurahan: string
+          latitude: number | null
+          longitude: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          telepon: string | null
+          updated_at: string
+        }
+        Insert: {
+          alamat: string
+          created_at?: string
+          id?: string
+          kecamatan: string
+          kelurahan: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          telepon?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alamat?: string
+          created_at?: string
+          id?: string
+          kecamatan?: string
+          kelurahan?: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha?: string
+          nomor_spbu?: string
+          penanggungjawab?: string
+          telepon?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -113,6 +355,96 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      spbe: {
+        Row: {
+          alamat: string
+          created_at: string
+          id: string
+          kecamatan: string
+          kelurahan: string
+          latitude: number | null
+          longitude: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          telepon: string | null
+          updated_at: string
+        }
+        Insert: {
+          alamat: string
+          created_at?: string
+          id?: string
+          kecamatan: string
+          kelurahan: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          telepon?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alamat?: string
+          created_at?: string
+          id?: string
+          kecamatan?: string
+          kelurahan?: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha?: string
+          nomor_spbu?: string
+          penanggungjawab?: string
+          telepon?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      spbu_lpg: {
+        Row: {
+          alamat: string
+          created_at: string
+          id: string
+          kecamatan: string
+          kelurahan: string
+          latitude: number | null
+          longitude: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          telepon: string | null
+          updated_at: string
+        }
+        Insert: {
+          alamat: string
+          created_at?: string
+          id?: string
+          kecamatan: string
+          kelurahan: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha: string
+          nomor_spbu: string
+          penanggungjawab: string
+          telepon?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alamat?: string
+          created_at?: string
+          id?: string
+          kecamatan?: string
+          kelurahan?: string
+          latitude?: number | null
+          longitude?: number | null
+          nama_usaha?: string
+          nomor_spbu?: string
+          penanggungjawab?: string
+          telepon?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

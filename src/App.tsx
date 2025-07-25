@@ -18,9 +18,8 @@ import GasStations from "./pages/admin/GasStations";
 import Reports from "./pages/admin/Reports";
 import PriceMonitoring from "./pages/admin/PriceMonitoring";
 import LPGSubsidized from "./pages/admin/LPGSubsidized";
-import Dokapii from "./pages/admin/Dokapii";
+import SpbuLpg from "./pages/admin/SpbuLpg";
 import Kepokmas from "./pages/admin/Kepokmas";
-import Training from "./pages/Training";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,16 +38,15 @@ const App = () => (
           <Route path="/settings" element={<Settings />} />
           <Route path="/operator" element={<Operator />} />
           <Route path="/market/:marketId" element={<MarketDetail />} />
-          <Route path="/training" element={<Training />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="markets" element={<Markets />} />
             <Route path="large-stores" element={<LargeStores />} />
             <Route path="gas-stations" element={<GasStations />} />
             <Route path="lpg-subsidized" element={<LPGSubsidized />} />
+            <Route path="spbu-lpg" element={<SpbuLpg />} />
             <Route path="price-monitoring" element={<PriceMonitoring />} />
             <Route path="reports" element={<Reports />} />
-            <Route path="dokapii" element={<Dokapii />} />
             <Route path="kepokmas" element={<Kepokmas />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
