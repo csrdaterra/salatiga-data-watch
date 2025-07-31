@@ -184,6 +184,39 @@ export type Database = {
         }
         Relationships: []
       }
+      commodities: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: number
+          is_essential: boolean | null
+          name: string
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: number
+          is_essential?: boolean | null
+          name: string
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: number
+          is_essential?: boolean | null
+          name?: string
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       jenis_bbm: {
         Row: {
           created_at: string
