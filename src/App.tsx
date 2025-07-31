@@ -20,6 +20,8 @@ import PriceMonitoring from "./pages/admin/PriceMonitoring";
 import LPGSubsidized from "./pages/admin/LPGSubsidized";
 import SpbuLpg from "./pages/admin/SpbuLpg";
 import Kepokmas from "./pages/admin/Kepokmas";
+import Dokapii from "./pages/admin/Dokapii";
+import BbmLpg from "./pages/admin/BbmLpg";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +50,8 @@ const App = () => (
             <Route path="price-monitoring" element={<PriceMonitoring />} />
             <Route path="reports" element={<Reports />} />
             <Route path="kepokmas" element={<Kepokmas />} />
+            <Route path="dokapii" element={<Dokapii />} />
+            <Route path="bbm-lpg" element={<BbmLpg />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
