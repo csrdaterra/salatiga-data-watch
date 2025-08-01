@@ -20,6 +20,8 @@ import PriceMonitoring from "./pages/admin/PriceMonitoring";
 import LPGSubsidized from "./pages/admin/LPGSubsidized";
 import SpbuLpg from "./pages/admin/SpbuLpg";
 import Kepokmas from "./pages/admin/Kepokmas";
+import StockPangan from "./pages/admin/StockPangan";
+import StockPanganReports from "./pages/admin/StockPanganReports";
 import Dokapii from "./pages/admin/Dokapii";
 import BbmLpg from "./pages/admin/BbmLpg";
 import NotFound from "./pages/NotFound";
@@ -50,6 +52,8 @@ const App = () => (
             <Route path="price-monitoring" element={<PriceMonitoring />} />
             <Route path="reports" element={<Reports />} />
             <Route path="kepokmas" element={<Kepokmas />} />
+            <Route path="stock-pangan" element={<StockPangan />} />
+            <Route path="stock-pangan-reports" element={<StockPanganReports />} />
             <Route path="dokapii" element={<Dokapii />} />
             <Route path="bbm-lpg" element={<BbmLpg />} />
           </Route>

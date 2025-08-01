@@ -34,6 +34,7 @@ import { useToast } from "@/components/ui/use-toast";
 const menuItems = [
   { title: "Dashboard", url: "/admin", icon: BarChart3 },
   { title: "Kepokmas", url: "/admin/kepokmas", icon: Package },
+  { title: "Stok Pangan", url: "/admin/stock-pangan", icon: Store },
   { title: "Pengaturan Sistem", url: "/admin/settings", icon: Settings },
   { title: "Toko Besar", url: "/admin/large-stores", icon: Building2 },
   { title: "SPBU & Pertashop", url: "/admin/gas-stations", icon: Fuel },
