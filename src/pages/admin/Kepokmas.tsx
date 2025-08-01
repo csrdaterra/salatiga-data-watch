@@ -1,10 +1,11 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info, Package, BarChart3, DollarSign, FileText } from "lucide-react";
+import { Info, Package, BarChart3, DollarSign, FileText, Store } from "lucide-react";
 import KepokmasTable from "@/components/KepokmasTable";
-import KepokmasPriceTable from "@/components/KepokmasPriceTable";
-import KepokmasReports from "@/components/KepokmasReports";
+import KepokmasMarketTable from "@/components/KepokmasMarketTable";
+import KepokmasEnhancedPriceForm from "@/components/KepokmasEnhancedPriceForm";
+import KepokmasEnhancedReports from "@/components/KepokmasEnhancedReports";
 
 const Kepokmas = () => {
   return (
@@ -31,13 +32,13 @@ const Kepokmas = () => {
             <Package className="h-4 w-4" />
             Data Komoditas
           </TabsTrigger>
+          <TabsTrigger value="markets" className="flex items-center gap-2">
+            <Store className="h-4 w-4" />
+            Data Pasar
+          </TabsTrigger>
           <TabsTrigger value="prices" className="flex items-center gap-2">
             <DollarSign className="h-4 w-4" />
-            Harga Komoditas
-          </TabsTrigger>
-          <TabsTrigger value="markets" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Data Pasar
+            Survey Harga
           </TabsTrigger>
           <TabsTrigger value="reports" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
@@ -49,20 +50,16 @@ const Kepokmas = () => {
           <KepokmasTable />
         </TabsContent>
 
-        <TabsContent value="prices">
-          <KepokmasPriceTable />
+        <TabsContent value="markets">
+          <KepokmasMarketTable />
         </TabsContent>
 
-        <TabsContent value="markets">
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">
-              Data pasar menggunakan sistem yang sudah ada di menu Markets.
-            </p>
-          </div>
+        <TabsContent value="prices">
+          <KepokmasEnhancedPriceForm />
         </TabsContent>
 
         <TabsContent value="reports">
-          <KepokmasReports />
+          <KepokmasEnhancedReports />
         </TabsContent>
       </Tabs>
     </div>

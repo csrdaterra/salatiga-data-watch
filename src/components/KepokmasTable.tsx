@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
 import { Search, Plus } from 'lucide-react';
+import ImportExportControls from './ImportExportControls';
 
 interface Commodity {
   id: number;
@@ -101,10 +102,13 @@ const KepokmasTable = () => {
             Menampilkan {filteredCommodities.length} dari {commodities.length} komoditas esensial
           </p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Tambah Komoditas
-        </Button>
+        <div className="flex gap-2">
+          <ImportExportControls onDataChange={loadCommodities} />
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Tambah Komoditas
+          </Button>
+        </div>
       </div>
 
       {/* Filter Controls */}

@@ -35,7 +35,6 @@ const menuItems = [
   { title: "Dashboard", url: "/admin", icon: BarChart3 },
   { title: "Kepokmas", url: "/admin/kepokmas", icon: Package },
   { title: "Pengaturan Sistem", url: "/admin/settings", icon: Settings },
-  { title: "Data Pasar", url: "/admin/markets", icon: Store },
   { title: "Toko Besar", url: "/admin/large-stores", icon: Building2 },
   { title: "SPBU & Pertashop", url: "/admin/gas-stations", icon: Fuel },
   { title: "LPG Bersubsidi", url: "/admin/lpg-subsidized", icon: MapPin },
