@@ -48,8 +48,10 @@ const Login = () => {
         // Navigate based on role
         if (user.role === "admin") {
           navigate("/admin");
+        } else if (user.role === "operator") {
+          navigate("/operator");
         } else {
-          navigate("/dashboard"); // For verifikator and operator
+          navigate("/dashboard"); // For verifikator
         }
       } else {
         toast({

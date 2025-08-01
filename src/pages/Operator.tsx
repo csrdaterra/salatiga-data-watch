@@ -1,12 +1,12 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingCart, Package, Eye, BarChart3, TrendingUp, Calendar } from "lucide-react";
+import { ShoppingCart, Package, Eye, BarChart3, TrendingUp, FileText } from "lucide-react";
 import CommoditySurveyForm from "@/components/CommoditySurveyForm";
 import StockPanganForm from "@/components/StockPanganForm";
 import KepokmasPreviewTable from "@/components/KepokmasPreviewTable";
 import StockPanganPreviewTable from "@/components/StockPanganPreviewTable";
 import KepokmasAnalytics from "@/components/KepokmasAnalytics";
-import WeeklyComparisonAnalytics from "@/components/WeeklyComparisonAnalytics";
+import OperatorReports from "@/components/OperatorReports";
 
 function OperatorPage() {
   return (
@@ -19,7 +19,7 @@ function OperatorPage() {
       </div>
 
       <Tabs defaultValue="kepokmas" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="kepokmas" className="flex items-center space-x-2">
             <ShoppingCart className="w-4 h-4" />
             <span>Input Kepokmas</span>
@@ -32,17 +32,13 @@ function OperatorPage() {
             <Eye className="w-4 h-4" />
             <span>Preview Kepokmas</span>
           </TabsTrigger>
-          <TabsTrigger value="preview-stock" className="flex items-center space-x-2">
-            <BarChart3 className="w-4 h-4" />
-            <span>Preview Stok</span>
-          </TabsTrigger>
           <TabsTrigger value="analytics" className="flex items-center space-x-2">
             <TrendingUp className="w-4 h-4" />
             <span>Analitik Kepokmas</span>
           </TabsTrigger>
-          <TabsTrigger value="weekly-comparison" className="flex items-center space-x-2">
-            <Calendar className="w-4 h-4" />
-            <span>Perbandingan Mingguan</span>
+          <TabsTrigger value="reports" className="flex items-center space-x-2">
+            <FileText className="w-4 h-4" />
+            <span>Laporan</span>
           </TabsTrigger>
         </TabsList>
 
@@ -58,16 +54,12 @@ function OperatorPage() {
           <KepokmasPreviewTable />
         </TabsContent>
 
-        <TabsContent value="preview-stock">
-          <StockPanganPreviewTable />
-        </TabsContent>
-
         <TabsContent value="analytics">
           <KepokmasAnalytics />
         </TabsContent>
 
-        <TabsContent value="weekly-comparison">
-          <WeeklyComparisonAnalytics />
+        <TabsContent value="reports">
+          <OperatorReports />
         </TabsContent>
       </Tabs>
     </div>
